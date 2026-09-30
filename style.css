@@ -1,0 +1,88 @@
+/* ---------- Tokens ---------- */
+:root {
+  --paper: #f6f6f1;          /* neutral rag paper */
+  --ink: #16263a;            /* Prussian-blue ink for text */
+  --prussian: #1f4e79;       /* Prussian blue: links, rules, the one accent */
+  --muted: #5d6874;          /* margin notes, captions */
+  --rule: #c9cfd6;
+  --fill-bg: #eaeef3;        /* placeholder blocks */
+  --measure: 34rem;
+  --margin-col: 15rem;
+  --serif: "Libre Caslon Text", "Noto Serif SC", Georgia, "Songti SC", serif;
+  --display: "Libre Caslon Display", "Libre Caslon Text", "Noto Serif SC", Georgia, serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #12161c; --ink: #dde3ea; --prussian: #8fb4dc;
+    --muted: #9aa5b1; --rule: #2d3640; --fill-bg: #1c232c;
+  }
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--serif); font-size: 1.125rem; line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--prussian); text-underline-offset: 0.18em; }
+a:focus-visible { outline: 2px solid var(--prussian); outline-offset: 3px; }
+.page { max-width: calc(var(--measure) + var(--margin-col) + 4rem); margin: 0 auto; padding: 0 1.5rem; }
+
+/* ---------- Title page: the one bold element ---------- */
+.title-page {
+  min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+  align-items: center; text-align: center; padding: 4rem 0; gap: 1.4rem;
+}
+.title-page .name { font-family: var(--display); font-size: clamp(2.8rem, 8vw, 5.2rem); line-height: 1.05; margin: 0; letter-spacing: 0.01em; }
+.title-page .subtitle { font-style: italic; font-size: 1.25rem; max-width: 28rem; margin: 0; }
+.title-page .double-rule { width: 12rem; border: 0; border-top: 3px double var(--prussian); margin: 0.4rem 0; }
+.title-page blockquote { max-width: 30rem; margin: 0; font-size: 1.05rem; }
+.title-page blockquote cite { display: block; margin-top: 0.6rem; font-style: normal; color: var(--muted); font-size: 0.95rem; }
+.title-page .imprint { font-size: 0.95rem; color: var(--muted); }
+
+/* ---------- Contents ---------- */
+.contents { max-width: var(--measure); margin: 0 auto 6rem; }
+.contents h2 { font-family: var(--display); font-weight: 400; font-size: 1.6rem; text-align: center; }
+.contents ol { list-style: none; padding: 0; margin: 0; }
+.contents li { display: flex; gap: 1rem; border-bottom: 1px solid var(--rule); padding: 0.55rem 0; }
+.contents li span:first-child { min-width: 4.5rem; color: var(--muted); }
+
+/* ---------- Parts & projects ---------- */
+.part { margin: 0 auto 7rem; }
+.part-opener { text-align: center; padding: 5rem 0 3rem; border-top: 3px double var(--prussian); }
+.part-opener .part-num { color: var(--muted); font-size: 1rem; margin: 0; }
+.part-opener h2 { font-family: var(--display); font-weight: 400; font-size: clamp(2.2rem, 5vw, 3.2rem); margin: 0.2rem 0 1rem; }
+.part-opener .fill { max-width: var(--measure); margin: 0 auto; text-align: left; }
+
+.project {
+  display: grid; grid-template-columns: minmax(0, var(--measure)) var(--margin-col);
+  column-gap: 3rem; margin: 0 0 5rem;
+}
+.project > header, .project > .main { grid-column: 1; }
+.project > .margin { grid-column: 2; grid-row: 2; font-size: 0.95rem; line-height: 1.55; color: var(--muted); border-left: 1px solid var(--rule); padding-left: 1.2rem; }
+.project h3 { font-size: 1.45rem; line-height: 1.3; margin: 0 0 0.3rem; font-weight: 700; }
+.project .meta { margin: 0 0 1.4rem; color: var(--muted); font-style: italic; font-size: 1rem; }
+.project h4 { font-size: 1rem; font-weight: 700; margin: 1.6rem 0 0.4rem; }
+.project .margin h4 { margin-top: 0; color: var(--ink); }
+.project .margin h4 + .fill + h4 { margin-top: 1.6rem; }
+.figure { margin: 1.5rem 0; }
+.figure .frame { border: 1px solid var(--rule); aspect-ratio: 4 / 3; display: grid; place-items: center; color: var(--muted); font-size: 0.95rem; padding: 1rem; text-align: center; }
+
+@media (max-width: 52rem) {
+  .project { grid-template-columns: minmax(0, 1fr); }
+  .project > .margin { grid-column: 1; grid-row: auto; border-left: 0; border-top: 1px solid var(--rule); padding: 1rem 0 0; margin-top: 1.5rem; }
+}
+
+/* ---------- Placeholders: delete the class once real text is in ---------- */
+.fill { background: var(--fill-bg); border: 1px dashed var(--prussian); border-radius: 2px; padding: 0.7rem 0.9rem; color: var(--muted); font-size: 0.95rem; margin: 0.4rem 0; }
+
+/* ---------- Colophon ---------- */
+.colophon { max-width: var(--measure); margin: 0 auto; padding: 4rem 0 6rem; border-top: 3px double var(--prussian); }
+.colophon h2 { font-family: var(--display); font-weight: 400; font-size: 1.6rem; text-align: center; }
+.colophon ul { padding-left: 1.2rem; }
+.colophon .note { color: var(--muted); font-size: 0.95rem; }
+.project .main > h4:first-child, .project .main > .figure + h4 { margin-top: 0; }
+.project .main > .figure:first-child { margin-top: 0; }
