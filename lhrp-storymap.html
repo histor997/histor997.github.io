@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Step Forward, Two Steps Back — LHRP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Fallback font stacks if Google Fonts unavailable */
+:root {
+  --font-serif: 'Merriweather', 'Georgia', 'Times New Roman', serif;
+  --font-sans:  'Open Sans', 'Arial', 'Helvetica Neue', sans-serif;
+  --font-mono:  'Space Mono', 'Courier New', 'Lucida Console', monospace;
+}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#111111;--navy2:#1a1a1a;--navy3:#222222;
+  --border:#333333;--text-1:#f0ece4;--text-2:#9a8f7e;--text-3:#5a5046;
+  --gold:#C4922A;--gold2:#8a6415;--red:#CF0A2C;--red2:#8f0720;
+  --hdr:52px;--panel:440px;--r:2px;--t:.25s ease;
+}
+html,body{height:100%;background:var(--navy);color:var(--text-1);overflow:hidden;font-family:var(--font-sans)}
+
+#hdr{position:fixed;top:0;left:0;right:0;height:var(--hdr);
+  background:#111111;border-bottom:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;z-index:900;gap:16px}
+#hdr-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+#hdr-brand img{height:24px;filter:brightness(0) invert(1);opacity:.85}
+#hdr-sep{width:1px;height:20px;background:var(--border);flex-shrink:0}
+#hdr-title{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hdr-nav{display:flex;gap:6px;flex-shrink:0}
+.sec-btn{font-family:var(--font-mono);font-size:9px;letter-spacing:.07em;
+  padding:4px 10px;border-radius:var(--r);border:1px solid var(--border);
+  background:transparent;color:var(--text-3);cursor:pointer;transition:all var(--t);text-transform:uppercase;white-space:nowrap}
+.sec-btn:hover{color:var(--text-1);border-color:var(--text-2)}
+.sec-btn.act-s1{color:var(--gold);border-color:var(--gold2);background:rgba(192,161,65,.08)}
+.sec-btn.act-s2{color:#5b9bd5;border-color:#2a5a8a;background:rgba(42,100,150,.08)}
+.sec-btn.act-s3{color:var(--red);border-color:var(--red2);background:rgba(207,10,44,.08)}
+
+#wrap{display:flex;position:fixed;top:var(--hdr);left:0;right:0;bottom:0}
+#panel{width:var(--panel);min-width:var(--panel);background:var(--navy2);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:10}
+#slide-scroll{flex:1;overflow-y:auto;overflow-x:hidden;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+#slide-scroll::-webkit-scrollbar{width:3px}
+#slide-scroll::-webkit-scrollbar-thumb{background:var(--border)}
+#slide-inner{padding:28px 28px 16px;transition:opacity .2s,transform .2s}
+#slide-inner.out{opacity:0;transform:translateY(6px)}
+
+.slide-meta{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.sec-pill{font-family:var(--font-mono);font-size:8px;letter-spacing:.12em;
+  text-transform:uppercase;padding:3px 8px;border-radius:1px;border:1px solid}
+.sec-pill.s0{color:var(--text-3);border-color:var(--border)}
+.sec-pill.s1{color:var(--gold);border-color:var(--gold2);background:rgba(192,161,65,.07)}
+.sec-pill.s2{color:#5b9bd5;border-color:#2a5a8a;background:rgba(42,100,150,.07)}
+.sec-pill.s3{color:var(--red);border-color:var(--red2);background:rgba(207,10,44,.07)}
+.slide-year{font-family:var(--font-mono);font-size:11px;color:var(--text-2)}
+.slide-loc{font-family:var(--font-mono);font-size:9px;color:var(--text-3);
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
+.slide-loc::before{content:'↗ ';color:var(--gold2)}
+
+.photo-wrap{width:100%;margin-bottom:18px;border:1px solid var(--border);background:var(--navy3);overflow:hidden}
+.photo-wrap img{width:100%;display:block;max-height:280px;object-fit:cover;object-position:top}
+.photo-cap{font-family:var(--font-mono);font-size:9px;color:var(--text-3);
+  line-height:1.6;padding:6px 8px;border-top:1px solid var(--border)}
+.photo-ph{width:100%;min-height:120px;display:flex;align-items:center;justify-content:center;
+  padding:20px;font-family:var(--font-mono);font-size:10px;color:var(--text-3);text-align:center}
+
+h2.headline{font-family:var(--font-serif);font-size:20px;font-weight:700;
+  line-height:1.25;color:var(--text-1);margin-bottom:14px}
+.title-h{font-family:var(--font-serif);font-size:26px;font-weight:700;
+  line-height:1.2;color:var(--text-1);margin-bottom:8px}
+.title-sub{font-family:var(--font-serif);font-size:13px;font-style:italic;
+  color:var(--text-2);line-height:1.65;margin-bottom:20px}
+.body-text{font-size:13px;font-weight:400;line-height:1.75;color:var(--text-1);margin-bottom:18px}
+.rule{width:40px;height:2px;background:var(--red);margin:16px 0}
+
+blockquote.quote{border-left:3px solid var(--red);padding:10px 14px;
+  margin:0 0 18px;background:rgba(207,10,44,.05)}
+blockquote.quote p{font-family:var(--font-serif);font-size:13px;font-style:italic;
+  color:var(--text-1);line-height:1.7;margin-bottom:5px}
+blockquote.quote cite{font-family:var(--font-mono);font-size:9px;color:var(--text-3);font-style:normal}
+
+.sources{border-top:1px solid var(--border);padding-top:12px;margin-top:4px}
+.src-link{display:flex;align-items:flex-start;gap:6px;font-family:var(--font-mono);
+  font-size:9px;color:var(--text-3);text-decoration:none;margin-bottom:5px;
+  letter-spacing:.03em;line-height:1.5;transition:color var(--t)}
+.src-link::before{content:'↗';color:var(--gold2);flex-shrink:0;margin-top:1px}
+.src-link:hover{color:var(--gold)}
+.connects{margin-top:14px}
+.cl{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--text-3);margin-bottom:7px}
+.ctags{display:flex;flex-wrap:wrap;gap:5px}
+.ctag{font-family:var(--font-mono);font-size:11px;padding:4px 10px;
+  border:1px solid var(--border);border-radius:var(--r);color:var(--text-2);
+  cursor:pointer;transition:all var(--t);background:transparent}
+.ctag:hover{border-color:var(--gold);color:var(--gold);background:rgba(192,161,65,.07)}
+
+#nav{border-top:1px solid var(--border);background:var(--navy2);
+  padding:12px 20px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.nbtn{width:34px;height:34px;border-radius:var(--r);border:1px solid var(--border);
+  background:transparent;color:var(--text-2);font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all var(--t);flex-shrink:0}
+.nbtn:hover:not(:disabled){border-color:var(--gold);color:var(--gold);background:rgba(192,161,65,.07)}
+.nbtn:disabled{opacity:.2;cursor:default}
+#prog-wrap{flex:1;height:2px;background:var(--border);border-radius:1px;cursor:pointer}
+#prog-bar{height:100%;background:var(--red);border-radius:1px;transition:width .4s ease;min-width:2px}
+#counter{font-family:var(--font-mono);font-size:10px;color:var(--text-3);flex-shrink:0;min-width:40px;text-align:right}
+
+#map-wrap{flex:1;position:relative}
+#map{width:100%;height:100%;background:#e8e0d0}
+#map-msg{display:none;position:absolute;inset:0;background:var(--navy);
+  flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px;pointer-events:none}
+#map-msg p{font-family:var(--font-serif);font-size:18px;font-style:italic;
+  color:var(--text-2);text-align:center;max-width:340px;line-height:1.7}
+#map-msg small{font-family:var(--font-mono);font-size:9px;color:var(--text-3);
+  text-align:center;max-width:300px;line-height:1.9;letter-spacing:.04em}
+#yr-bg{position:fixed;right:calc(var(--panel) + 20px);bottom:80px;
+  font-family:var(--font-serif);font-size:200px;font-weight:700;
+  color:var(--text-1);opacity:.022;pointer-events:none;line-height:1;z-index:1;
+  user-select:none;letter-spacing:-.02em}
+
+.mpast{width:8px;height:8px;border-radius:50%;background:var(--text-3);opacity:.45}
+.mcur{width:14px;height:14px;border-radius:50%;background:var(--red);
+  box-shadow:0 0 0 4px rgba(207,10,44,.25);animation:pulse 2s infinite}
+.mov-s1{width:10px;height:10px;border-radius:50%;background:var(--gold);cursor:pointer;
+  box-shadow:0 0 0 3px rgba(196,146,42,.3);animation:pulse-gold 2.4s infinite}
+.mov-s2{width:10px;height:10px;border-radius:50%;background:#5b9bd5;cursor:pointer;
+  box-shadow:0 0 0 3px rgba(91,155,213,.3);animation:pulse-blue 2.8s infinite}
+.mov-s3{width:10px;height:10px;border-radius:50%;background:var(--red);cursor:pointer;
+  box-shadow:0 0 0 3px rgba(207,10,44,.3);animation:pulse 2s infinite}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 4px rgba(207,10,44,.25)}
+  50%{box-shadow:0 0 0 9px rgba(207,10,44,.08)}
+}
+@keyframes pulse-gold{
+  0%,100%{box-shadow:0 0 0 3px rgba(196,146,42,.3)}
+  50%{box-shadow:0 0 0 8px rgba(196,146,42,.08)}
+}
+@keyframes pulse-blue{
+  0%,100%{box-shadow:0 0 0 3px rgba(91,155,213,.3)}
+  50%{box-shadow:0 0 0 8px rgba(91,155,213,.08)}
+}
+.leaflet-container{background:#020d1a!important}
+.leaflet-tile-pane{filter:saturate(1.0) brightness(1.0)}
+.leaflet-popup-content-wrapper{
+  background:rgba(4,30,66,.92)!important;border:1px solid var(--border)!important;
+  border-radius:2px!important;box-shadow:0 2px 12px rgba(0,0,0,.3)!important;padding:0!important}
+.leaflet-popup-content{font-family:var(--font-mono)!important;font-size:10px!important;
+  color:var(--text-1)!important;padding:7px 12px!important;margin:0!important;
+  letter-spacing:.06em!important;text-transform:uppercase!important}
+.leaflet-popup-tip{border-top-color:rgba(4,30,66,.92)!important}
+.leaflet-popup-tip-container{display:block!important}
+.leaflet-control-attribution{background:rgba(255,255,255,.85)!important;
+  color:#444!important;font-size:9px!important}
+
+/* ── MAP OVERLAY LEGEND ─────────────────────────────── */
+#map-legend{position:absolute;bottom:20px;left:16px;z-index:500;
+  background:rgba(17,17,17,.92);border:1px solid #333;
+  padding:10px 14px;display:none}
+#map-legend.visible{display:block}
+.leg-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.leg-row:last-child{margin-bottom:0}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.leg-label{font-family:'Space Mono','Courier New',Courier,monospace;
+  font-size:9px;color:#9a8f7e;letter-spacing:.07em;text-transform:uppercase}
+
+/* ── PANEL LEGEND BOX ───────────────────────────────── */
+.intro-legend{margin-top:20px;border:1px solid #333;
+  padding:14px 16px;background:rgba(255,255,255,.03)}
+.intro-legend-title{font-family:'Space Mono','Courier New',Courier,monospace;
+  font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:#5a5046;margin-bottom:12px}
+.intro-legend-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.intro-legend-row:last-child{margin-bottom:0}
+.intro-legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.intro-legend-text{font-family:'Space Mono','Courier New',Courier,monospace;
+  font-size:10px;color:#7a9cbf;letter-spacing:.04em;line-height:1.4;
+  font-weight:700}
+.intro-legend-period{font-family:'Space Mono','Courier New',Courier,monospace;
+  font-size:9px;color:#5a5046;letter-spacing:.04em;margin-top:2px;line-height:1.5}
+.intro-legend-note{margin-top:12px;padding-top:10px;border-top:1px solid #333;
+  font-family:'Space Mono','Courier New',Courier,monospace;
+  font-size:9px;color:#5a5046;letter-spacing:.05em;line-height:1.8}
+
+
+/* Context slides (dissolved Section II) */
+.sec-pill.ctx{color:var(--gold);border-color:var(--gold2);
+  background:rgba(192,161,65,.07)}
+.ctx-label{font-family:'Space Mono','Courier New',Courier,monospace;
+  font-size:8px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--gold2);margin-bottom:6px;opacity:.8}
+
+/* Primary Sources drawer */
+#src-drawer{position:fixed;top:var(--hdr);right:-520px;width:500px;
+  height:calc(100% - var(--hdr));background:#111;border-left:1px solid #333;
+  z-index:800;transition:right .3s ease;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:#333 transparent}
+#src-drawer::-webkit-scrollbar{width:3px}
+#src-drawer::-webkit-scrollbar-thumb{background:#333}
+#src-drawer.open{right:0}
+#src-drawer-hdr{padding:16px 20px;border-bottom:1px solid #333;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;background:#111;z-index:1}
+#src-drawer-title{font-family:'Space Mono','Courier New',Courier,monospace;
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#9a8f7e}
+#src-close{background:transparent;border:1px solid #333;color:#5a5046;
+  font-family:'Space Mono',monospace;font-size:9px;padding:4px 10px;
+  cursor:pointer;transition:color .2s;letter-spacing:.08em;text-transform:uppercase}
+#src-close:hover{color:var(--gold);border-color:var(--gold)}
+.src-section{padding:14px 20px 4px;border-bottom:1px solid #222}
+.src-section-label{font-family:'Space Mono','Courier New',Courier,monospace;
+  font-size:8px;letter-spacing:.15em;text-transform:uppercase;
+  color:#3a5f82;margin-bottom:10px}
+.src-card{margin-bottom:12px;padding:10px 12px;border:1px solid #222;
+  background:rgba(255,255,255,.02);cursor:pointer;transition:border-color .2s}
+.src-card:hover{border-color:var(--gold)}
+.src-card-title{font-family:'Merriweather','Palatino Linotype',Palatino,Georgia,serif;
+  font-size:11px;color:#dde8f5;margin-bottom:4px;line-height:1.4}
+.src-card-event{font-family:'Space Mono','Courier New',Courier,monospace;
+  font-size:9px;color:var(--gold);margin-bottom:4px;letter-spacing:.04em}
+.src-card-desc{font-family:'Space Mono','Courier New',Courier,monospace;
+  font-size:9px;color:#5a5046;line-height:1.6}
+.src-card-img{width:100%;max-height:120px;object-fit:cover;margin-top:8px;
+  border:1px solid #222;display:block}
+.src-card-img.broken{display:none}
+.src-card-link{font-family:'Space Mono','Courier New',Courier,monospace;
+  font-size:9px;color:#3a5f82;text-decoration:none;display:inline-block;
+  margin-top:6px;transition:color .2s}
+.src-card-link:hover{color:var(--gold)}
+.src-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);
+  z-index:799}
+.src-overlay.open{display:block}
+
+
+/* Contextual illustration label */
+.photo-cap.ctx-cap::before{content:'Contextual illustration \2014 ';font-style:italic;color:var(--gold);font-size:8px;display:block;margin-bottom:2px}
+/* ── SCHOLARLY NOTES PANEL ──────────────────────────── */
+.sn-toggle{
+  display:flex;align-items:center;gap:7px;
+  font-family:'Space Mono','Courier New',Courier,monospace;
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-3);background:transparent;border:none;
+  cursor:pointer;padding:10px 0 2px;transition:color .25s ease;
+  width:100%;text-align:left}
+.sn-toggle:hover{color:var(--gold)}
+.sn-toggle-arrow{
+  font-size:9px;transition:transform .2s ease;
+  display:inline-block;flex-shrink:0}
+.sn-toggle.open .sn-toggle-arrow{transform:rotate(90deg)}
+.sn-panel{
+  display:none;
+  border-top:1px solid var(--border);
+  padding:12px 0 4px;margin-top:2px}
+.sn-panel.open{display:block}
+.sn-label{
+  font-family:'Space Mono','Courier New',Courier,monospace;
+  font-size:8px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-3);margin-bottom:10px;opacity:.6}
+.sn-item{
+  font-family:'Space Mono','Courier New',Courier,monospace;
+  font-size:9px;color:var(--text-3);line-height:1.8;
+  letter-spacing:.02em;margin-bottom:9px;
+  padding-left:10px;border-left:2px solid var(--border)}
+.sn-item a{
+  color:var(--text-3);text-decoration:underline;
+  text-decoration-color:var(--border);transition:color .25s ease}
+.sn-item a:hover{color:var(--gold);text-decoration-color:var(--gold)}
+</style>
+</head>
+<body>
+<header id="hdr">
+  <div id="hdr-brand">
+    <img src="https://lhrp.georgetown.edu/wp-content/uploads/2021/12/logo-laborhistory-300x73.png" alt="LHRP">
+    <div id="hdr-sep"></div>
+    <div id="hdr-title">One Step Forward, Two Steps Back</div>
+  </div>
+  <nav id="hdr-nav"><button class="sec-btn" id="overview-btn" onclick="jump(0)">Overview</button><button class="sec-btn" id="src-btn" onclick="openSrcDrawer()">Primary Sources</button>
+    <button class="sec-btn" onclick="jumpSec(1)">I: Sparks to Movements</button>
+    <button class="sec-btn" onclick="jumpSec(2)">Context</button>
+    <button class="sec-btn" onclick="jumpSec(3)">III: Alternative Imagination</button>
+  </nav>
+</header>
+
+<div id="wrap">
+  <aside id="panel">
+    <div id="slide-scroll"><div id="slide-inner"></div></div>
+    <nav id="nav">
+      <button class="nbtn" id="prev" onclick="go(-1)">&#8592;</button>
+      <div id="prog-wrap" onclick="progClick(event)"><div id="prog-bar"></div></div>
+      <button class="nbtn" id="next" onclick="go(1)">&#8594;</button>
+      <div id="counter">0 / 0</div>
+    </nav>
+  </aside>
+  <div id="map-wrap">
+    <div id="map"></div>
+    <div id="map-legend">
+      <div class="leg-row"><div class="leg-dot" style="background:#C4922A"></div><div class="leg-label">I &middot; 1867&ndash;1955</div></div>
+      <div class="leg-row"><div class="leg-dot" style="background:#5b9bd5"></div><div class="leg-label">Context slides</div></div>
+      <div class="leg-row"><div class="leg-dot" style="background:#CF0A2C"></div><div class="leg-label">III &middot; 1898&ndash;Today</div></div>
+    </div>
+    <div id="map-msg">
+      <p>The Pacific Labor Corridor &#8212; Hawai&#699;i &middot; California &middot; Pacific Northwest</p>
+      <small>INTERACTIVE MAP. Download and open in Chrome or Firefox for the full experience with animated markers across the Pacific labor corridor</small>
+    </div>
+  </div>
+</div>
+<div id="yr-bg"></div>
+<div class="src-overlay" id="src-overlay" onclick="closeSrcDrawer()"></div>
+<div id="src-drawer">
+  <div id="src-drawer-hdr">
+    <div id="src-drawer-title">Primary Sources</div>
+    <button id="src-close" onclick="closeSrcDrawer()">&#215; Close</button>
+  </div>
+  <div id="src-content"></div>
+</div>
+<div id="vid-modal" onclick="closeVid(event)">
+  <div id="vid-box">
+    <button id="vid-close" onclick="closeVidBtn()">&#215; Close</button>
+    <iframe id="vid-frame" src="" allow="autoplay;encrypted-media" allowfullscreen></iframe>
+    <div id="vid-meta"></div>
+  </div>
+</div>
+
+<script>
+// ─── PHOTO REGISTRY ───────────────────────────────────────────────────────────
+var P = {
+  RR1867:   ["https://upload.wikimedia.org/wikipedia/commons/c/c4/Laying_track_in_Echo_Canyon_Utah.jpg",
+             "Chinese workers laying track in Echo Canyon, Utah, ca. 1869 \u00b7 Public domain via Wikimedia Commons"],
+  YICKWO:   ["https://chroniclingamerica.loc.gov/lccn/sn82015415/1886-05-11/ed-1/seq-1/thumbnail.jpg",
+             "Yick Wo v. Hopkins coverage \u2014 The Hawaiian Star, May 11, 1886 \u00b7 LOC Chronicling America"],
+  HI1900:   ["https://upload.wikimedia.org/wikipedia/commons/2/28/Chinese_contract_laborers_on_a_sugar_plantation_in_19th_century_Hawaii.jpg",
+             "Contract laborers on a Hawaiian sugar plantation, 19th c. \u00b7 Public domain via Wikimedia Commons"],
+  OXNARD:   ["https://chroniclingamerica.loc.gov/lccn/sn93051660/1903-04-03/ed-1/seq-1/thumbnail.jpg",
+             "Japs and Mexicans Unionized \u00b7 Ventura Free Press, April 3, 1903 \u00b7 LOC Chronicling America"],
+  TAMMANY:  ["https://chroniclingamerica.loc.gov/lccn/sn83030214/1894-10-28/ed-1/seq-1/thumbnail.jpg",
+             "Tammany Hall coverage \u00b7 New York Tribune, 1894 \u00b7 LOC Chronicling America"],
+  HI1909:   ["https://upload.wikimedia.org/wikipedia/commons/4/45/Early_Japanese_immigrants_to_Hawaii.jpg",
+             "Early Japanese immigrants to Hawai'i, ca. 1900s \u00b7 Public domain via Wikimedia Commons"],
+  HI1920:   ["https://chroniclingamerica.loc.gov/lccn/sn84020645/1920-01-28/ed-1/seq-1/thumbnail.jpg",
+             "Sugar Farms Tied Up \u00b7 Pacific Commercial Advertiser, Jan. 28, 1920 \u00b7 LOC Chronicling America"],
+  OZAWA:    ["https://upload.wikimedia.org/wikipedia/commons/3/32/US_Supreme_Court_Building.jpg",
+             "U.S. Supreme Court, which ruled on Ozawa v. United States, 260 U.S. 178 (1922) \u00b7 Wikimedia Commons"],
+  THIND:    ["https://chroniclingamerica.loc.gov/lccn/sn84024808/1923-02-20/ed-1/seq-1/thumbnail.jpg",
+             "U.S. v. Thind decision coverage \u00b7 Honolulu Star-Bulletin, Feb. 20, 1923 \u00b7 LOC Chronicling America"],
+  HANAPEPE: ["https://chroniclingamerica.loc.gov/lccn/sn84024808/1920-01-21/ed-1/seq-1/thumbnail.jpg",
+             "Filipinos Sugar Farm Workers Strike \u00b7 Honolulu Star-Bulletin, Jan. 21, 1920 \u00b7 LOC Chronicling America"],
+  MANLAPIT: ["https://chroniclingamerica.loc.gov/lccn/sn84020097/1927-11-26/ed-1/seq-1/thumbnail.jpg",
+             "Manlapit Begins Filipino Labor Unions in U.S. \u00b7 The Daily Worker, Nov. 26, 1927 \u00b7 LOC Chronicling America"],
+  SEA1929:  ["https://chroniclingamerica.loc.gov/lccn/sn88085780/1929-05-30/ed-1/seq-1/thumbnail.jpg",
+             "Migration of Filipinos in the Pacific Northwest \u00b7 Seattle Star, May 30, 1929 \u00b7 LOC Chronicling America"],
+  SALINAS:  ["https://chroniclingamerica.loc.gov/lccn/sn92070146/1934-09-04/ed-1/seq-1/thumbnail.jpg",
+             "Strike At Salinas Turns Into Flop \u00b7 Imperial Valley Press, Sept. 4, 1934 \u00b7 LOC Chronicling America"],
+  WATSONVL: ["https://chroniclingamerica.loc.gov/lccn/sn92070146/1930-01-24/ed-1/seq-1/thumbnail.jpg",
+             "Anti-Filipino riot coverage \u00b7 San Francisco Examiner, Jan. 24, 1930 \u00b7 LOC Chronicling America"],
+  CHLA:     ["https://chroniclingamerica.loc.gov/lccn/sn84020097/1930-01-06/ed-1/seq-1/thumbnail.jpg",
+             "8000 Mexican Agricultural Workers Strike in Cal. \u00b7 The Daily Worker, Jan. 6, 1930 \u00b7 LOC Chronicling America"],
+  DUYUNGAN: ["https://chroniclingamerica.loc.gov/lccn/sn87093377/1936-12-04/ed-1/seq-1/thumbnail.jpg",
+             "3 Filipinos Dead in Gun Battle \u00b7 Bremerton Searchlight, Dec. 4, 1936 \u00b7 LOC Chronicling America"],
+  FALA39:   ["https://chroniclingamerica.loc.gov/lccn/sn92070146/1939-04-07/ed-1/seq-1/thumbnail.jpg",
+             "Asparagus Cutters Walk Off of Jobs \u00b7 San Francisco Examiner, April 7, 1939 \u00b7 LOC Chronicling America"],
+  NEWDEAL:  ["https://chroniclingamerica.loc.gov/lccn/sn83045012/1933-12-08/ed-1/seq-1/thumbnail.jpg",
+             "Quotas Upheld and Barring of Filipino Labor Demanded \u00b7 Washington Post, Dec. 8, 1933 \u00b7 LOC Chronicling America"],
+  WRA:      ["https://upload.wikimedia.org/wikipedia/commons/9/98/Manzanar_Children.jpg",
+             "Children at Manzanar concentration camp, California, 1942 \u00b7 Ansel Adams / LOC, public domain"],
+  LUCECELL: ["https://chroniclingamerica.loc.gov/lccn/sn84024808/1946-07-03/ed-1/seq-1/thumbnail.jpg",
+             "Luce-Celler Act coverage \u00b7 Honolulu Star-Bulletin, July 3, 1946 \u00b7 LOC Chronicling America"],
+  ILWU46:   ["https://upload.wikimedia.org/wikipedia/commons/2/28/Chinese_contract_laborers_on_a_sugar_plantation_in_19th_century_Hawaii.jpg",
+             "Hawaiian sugar plantation workers \u00b7 the labor system the 1946 strike dismantled \u00b7 Public domain"],
+  LOCAL37:  ["https://chroniclingamerica.loc.gov/lccn/sn88085780/1955-10-14/ed-1/seq-1/thumbnail.jpg",
+             "ILWU Local 37 Election Results \u00b7 Seattle Star, Oct. 14, 1955 \u00b7 LOC Chronicling America"],
+  BULOSAN:  ["https://upload.wikimedia.org/wikipedia/en/a/a8/Carlos_Bulosan.jpg",
+             "Carlos Bulosan, Filipino-American labor writer and activist \u00b7 Public domain"],
+  DIGIORGIO:["https://chroniclingamerica.loc.gov/lccn/sn84020097/1948-01-06/ed-1/seq-1/thumbnail.jpg",
+             "DiGiorgio strike coverage \u00b7 Daily Worker, 1948 \u00b7 LOC Chronicling America"],
+  CORAM83:  ["https://upload.wikimedia.org/wikipedia/commons/b/b2/Fred_Korematsu_Day_Oakland_2012.jpg",
+             "Fred Korematsu, whose 1942 conviction was vacated in 1983 \u00b7 Wikimedia Commons"],
+  LANGE_CREW:    ["https://upload.wikimedia.org/wikipedia/commons/8/8a/Filipinos_cutting_lettuce,_Salinas_Valley,_California,_8e07356.jpg","[Contextual] Filipinos cutting lettuce, Salinas Valley, CA, June 1935 · Dorothea Lange / LOC FSA-OWI · Public domain"],
+  LANGE_SALINAS: ["https://upload.wikimedia.org/wikipedia/commons/8/8a/Filipinos_cutting_lettuce,_Salinas_Valley,_California,_8e07356.jpg","[Contextual] Filipino boys thinning lettuce, Salinas, CA, April 1939 · Dorothea Lange / LOC FSA-OWI · Public domain"],
+  LANGE_SOLO:    ["https://upload.wikimedia.org/wikipedia/commons/8/8a/Filipinos_cutting_lettuce,_Salinas_Valley,_California,_8e07356.jpg","[Contextual] Filipino lettuce field laborer, Imperial Valley, CA, Feb 1939 · Dorothea Lange / LOC FSA-OWI · Public domain"],
+  LANGE_THIN:    ["https://upload.wikimedia.org/wikipedia/commons/8/8a/Filipinos_cutting_lettuce,_Salinas_Valley,_California,_8e07356.jpg","[Contextual] Filipino thinning lettuce, Salinas Valley, CA, April 1939 · Dorothea Lange / LOC FSA-OWI · Public domain"],
+  ITLIONG:  ["https://upload.wikimedia.org/wikipedia/commons/0/0d/Larry_Itliong.jpg",
+             "Larry Itliong, Filipino-American labor organizer, AWOC \u00b7 Walter P. Reuther Library / Public domain"]
+};
+
+// ─── SLIDE DATA ───────────────────────────────────────────────────────────────
+
+var SLIDES = [
+  {sec:0,year:'',loc:'The Pacific',lat:32,lon:-148,zoom:3,headline:'One Step Forward, Two Steps Back',isTitle:true,sub:'Asian migrant workers built the first multi-ethnic labor unions in American history: in the cane fields of Hawaiʻi, the lettuce rows of California, and the salmon canneries of the Pacific Northwest.',text:'This StoryMap traces three arcs: the emergence of Asian migrant labor organizing from individual refusal to concerted multiethnic movements; a contrast with how European immigrant workers entered political structures from which Asian workers were legally excluded; and the alternative political imagination that was transnational, anti-imperial, and dignity-centered, built by Asian migrant workers in the periphery.',photo:null,quote:null,video:null,sources:[],connects:[]},
+  {sec:1,year:'1867',loc:'Sierra Nevada, California',lat:39.32,lon:-120.5,zoom:8,headline:'The First Organized Strike',text:'On June 24, 1867, approximately 3,000 Chinese railroad workers laid down their tools across thirty miles of Sierra Nevada track. They demanded equal pay with white workers earning more than twice as much, shorter hours in explosive-filled tunnels, and an end to corporal punishment. The Central Pacific cut off all food supplies. After eight days, workers returned without formal concessions, but wages were quietly raised. No letter written by a Chinese worker on this railroad has ever been found. What survives is the strike itself.',photo:'RR1867',quote:{text:'About 3,000 went on strike to demand the same wages as the white workers, who were paid more than twice as much.',cite:'Stanford Chinese Railroad Workers Project, 2019'},video:null,sources:[{l:'Stanford Chinese Railroad Workers Project',u:'https://web.stanford.edu/group/chineserailroad/cgi-bin/website/virtual/'},{l:'MOCA: Railroad Chinese Labor Strike, June 24, 1867',u:'https://www.mocanyc.org/collections/stories/railroad-chinese-labor-strike-june-24th-1867/'}],connects:[{l:'→ Yick Wo 1886: same community, legal strategy next',i:2}]},
+  {sec:1,year:'1886',loc:'San Francisco, California',lat:37.793,lon:-122.407,zoom:13,headline:'The Laundry, the Constitution, and 240 Permits Denied',text:'In 1880, San Francisco required permits for wooden laundry buildings. Of 320 laundries, 240 were Chinese-owned. Not one Chinese application was approved; 80 non-Chinese applications were granted. Lee Yick, who had operated his laundry at 349 Third Street for 22 years, refused to pay the fine, was jailed, and petitioned for habeas corpus. The Chinese Six Companies funded the litigation collectively. On May 10, 1886, the Supreme Court ruled unanimously: a law neutral on its face but administered with discriminatory intent violates the 14th Amendment. It was the first time the Equal Protection Clause protected non-citizens. The ruling was later used to overturn Jim Crow.',photo:'YICKWO',quote:{text:'Though the law itself be fair on its face and impartial in appearance, yet, if it is applied and administered by public authority with an evil eye and an unequal hand, the denial of equal justice is still within the prohibition of the constitution.',cite:'Justice T. Stanley Matthews, Yick Wo v. Hopkins, 118 U.S. 356 (1886)'},video:null,sources:[{l:'Yick Wo v. Hopkins, 118 U.S. 356 (1886) · Justia',u:'https://supreme.justia.com/cases/federal/us/118/356/'},{l:'Zinn Education Project: Lee Yick Wins Equal Protection (May 10, 1886)',u:'https://www.zinnedproject.org/news/tdih/lee-yick-wins-equal-protection-case/'},{l:'SF Standard: Yick Wo 140th anniversary (2026)',u:'https://sfstandard.com/2026/05/10/yick-wo-140-anniversary/'}],connects:[{l:'← 1867 Railroad: same Chinese community',i:1},{l:'→ 1933 CHLA NYC: same logic, different generation',i:15}]},
+  {sec:1,year:'1900',loc:'Oʻahu, Hawaiʻi',lat:21.4,lon:-158.0,zoom:9,headline:'Before Organization: A Wave of Strikes',text:'With the Organic Act of 1900 making US laws applicable in Hawaiʻi and ending contract labor, Japanese plantation workers launched a wave of spontaneous strikes across Oʻahu. No union, no structure, just refusal. The plantation owners’ response was immediate: hire non-Japanese workers and begin recruiting a more ethnically diverse labor force to prevent future solidarity. The architecture of divide-and-conquer was built into the plantation from the beginning. Workers would spend forty-six years dismantling it.',photo:'HI1900',quote:null,video:null,sources:[{l:'LOC: Hawaii Life in a Plantation Society',u:'https://www.loc.gov/classroom-materials/immigration/japanese/hawaii-life-in-a-plantation-society/'},{l:'ILWU Local 142: Honoring the Filipino Sakada',u:'https://www.ilwulocal142.org/honoring-filipino-sakada-part-i'}],connects:[{l:'→ Oʻahu 1909: organized demand, same structural problem',i:6}]},
+  {sec:1,year:'1903',loc:'Oxnard, California',lat:34.2,lon:-119.18,zoom:11,headline:'The First Interracial Union',text:'On February 11, 1903, 500 Japanese and 200 Mexican sugar beet workers formed the Japanese-Mexican Labor Association, communicating through interpreters and electing officers from both groups. By March, membership grew to 1,200, representing over 90% of the beet labor force. They launched the first successful multiracial agricultural strike in California history. When the AFL offered a charter on the condition that Asian members be excluded, JMLA secretary J.M. Lizarras refused. Workers here chose solidarity over institutional recognition.',photo:'OXNARD',quote:{text:'We will refuse any other kind of charter, except one which will wipe out race prejudice and recognize our union as it is.',cite:'J.M. Lizarras, JMLA Secretary, 1903'},video:null,sources:[{l:'LOC: Japs and Mexicans Unionized (1903)',u:'https://www.loc.gov/resource/sn93051660/1903-04-03/ed-1/'},{l:'LOC: Armed Japanese Attend Funeral (1903)',u:'https://chroniclingamerica.loc.gov/lccn/sn85066387/1903-03-28/ed-1/seq-2/'},{l:'Wikipedia: Oxnard Strike of 1903',u:'https://en.wikipedia.org/wiki/Oxnard_strike_of_1903'}],connects:[{l:'→ Context: Tammany Hall (European path AFL excluded Asian workers from)',i:5}]},
+  {sec:2,year:'1817–1905',loc:'Manhattan, New York',lat:40.76,lon:-73.99,zoom:12,headline:'Context: The Machine and Its Immigrants',text:'The same year the JMLA was refused an AFL charter because of its Asian membership, Tammany Hall was absorbing its third generation of Irish immigrants into city politics. Tammany provided jobs, housing, legal help, and political voice in exchange for votes. By the early 20th century this transactional relationship was the template for European immigrant political incorporation. It worked. But only for those who could vote. Asian immigrants, barred from naturalization under the 1790 Naturalization Act and the 1882 Chinese Exclusion Act, could not.',photo:'TAMMANY',quote:{text:'When a man works for Tammany Hall and gets into trouble, Tammany Hall does not desert him.',cite:'George Washington Plunkitt, Plunkitt of Tammany Hall, 1905'},video:null,sources:[{l:'Plunkitt of Tammany Hall (1905): full text, public domain',u:'https://www.gutenberg.org/ebooks/2810'}],connects:[{l:'← Oxnard 1903: AFL refuses Asian members',i:4},{l:'→ Context: New Deal exclusion',i:18}]},
+  {sec:1,year:'1909',loc:'Oʻahu, Hawaiʻi',lat:21.35,lon:-157.9,zoom:9,headline:'Equal Pay, Unequal Skin: The 1909 Strike and Its Lesson',text:'From May 9 to August 4, 1909, some 7,000 Japanese workers organized through the Higher Wage Association staged the first island-wide plantation strike in Hawaiian history, demanding equal pay with Portuguese and Puerto Rican workers doing identical labor. Plantation owners broke the strike using Korean, Portuguese, Chinese, and Hawaiian strikebreakers. More consequentially, the HSPA dramatically accelerated the recruitment of Filipino workers to Hawaiʻi as a long-term strategy to diversify and divide the plantation workforce before the next strike came. The plantation had learned a lesson. So had the workers.',photo:'HI1909',quote:null,video:null,sources:[{l:'UH CLEAR / Honolulu Record: Japanese Workers Struck For Equal Pay',u:'https://www.hawaii.edu/uhwo/clear/HonoluluRecord/articles/v10n42/Japanese%20Workers%20Struck%20For%20Equal%20Pay%20For%20Equal%20Work.html'},{l:'Densho: Strikers, Scabs, and Sugar Mongers',u:'https://densho.org/catalyst/strikers-scabs-sugar-mongers-immigrant-labor-struggle-shaped-hawaii-know-today/'},{l:'LOC Chronicling America: Seven Thousand Idle Japanese, May 24, 1909',u:'https://chroniclingamerica.loc.gov/lccn/sn82015415/1909-05-24/ed-1/seq-1/'}],connects:[{l:'→ Oʻahu 1920: failure teaches solidarity',i:7}]},
+  {sec:1,year:'1920',loc:'Oʻahu, Hawaiʻi',lat:21.45,lon:-158.1,zoom:9,headline:'Hawaiʻi’s First Multiethnic Union',text:'8,300 workers, 77% of Oʻahu’s entire plantation workforce, walked out together in January 1920. Japanese and Filipino workers, joined by Spanish and Portuguese laborers, refused the divide-and-conquer. Planters evicted 12,000 workers in the midst of an influenza epidemic; approximately 1,200 family members died of the disease. The Hawaii Laborers’ Association, the islands’ first multiethnic labor union, was formed in the aftermath. This solidarity was not sentiment. It was strategy born of watching the 1909 failure.',photo:'HI1920',quote:{text:'We do not wish to strike. We want peace and order; we love labor and production. But when we think of the capitalists who show no sympathy toward the struggling laborers, we cannot remain silent.',cite:'Filipino-Japanese Labor Union strike pamphlet, 1920'},video:null,sources:[{l:'LOC: Sugar Farms Tied Up (1920)',u:'https://www.loc.gov/resource/sn84020645/1920-01-28/ed-1/'},{l:'LOC: Filipinos Sugar Farm Workers Strike (1920)',u:'https://www.loc.gov/resource/sn84024808/1920-01-21/ed-1/'},{l:'Honolulu Star-Advertiser: Echoes of Spanish Flu in Hawaii',u:'https://www.staradvertiser.com/2020/04/06/hawaii-news/echoes-of-spanish-flu-pandemic-in-hawaii-a-century-ago-heard-in-coronavirus-outbreak/'}],connects:[{l:'← 1909: the failure that made this necessary',i:6},{l:'→ Kauaʻi 1924: without solidarity, the outcome changes',i:10},{l:'→ Hawaiʻi 1946: the model finally wins at scale',i:21}]},
+  {sec:1,year:'1922',loc:'Honolulu, Hawaiʻi',lat:21.3,lon:-157.85,zoom:10,headline:'You Must Be White: Ozawa v. United States',text:'Takao Ozawa had lived in the United States for 20 years, attended American schools, spoken English at home, and converted to Christianity. The Pacific Coast Japanese Association backed his naturalization petition collectively, funding litigation as a community. In November 1922, the Supreme Court ruled unanimously that Ozawa was not of the Caucasian race and therefore ineligible for citizenship. The same year Filipino plantation workers were building the organizing infrastructure that would lead to the 1924 strike, the courts were slamming shut the door on their legal personhood.',photo:'OZAWA',quote:{text:'The words of familiar speech, which were used by those who framed the constitution... were white persons... words of common speech, and not of scientific origin. The average well-informed white American would learn with some degree of surprise that they are Caucasians.',cite:'Justice George Sutherland, Ozawa v. United States, 260 U.S. 178 (1922)'},video:null,sources:[{l:'Ozawa v. United States, 260 U.S. 178 (1922) · Justia',u:'https://supreme.justia.com/cases/federal/us/260/178/'},{l:'Teaching Legal History: Legalizing Whiteness',u:'https://teachinglegalhistory.unl.edu/s/oer/item/2127'}],connects:[{l:'→ Thind 1923: courts move the goalposts',i:9},{l:'→ Luce-Celler 1946: the exclusion finally reversed',i:20}]},
+  {sec:1,year:'1923',loc:'Portland, Oregon',lat:45.52,lon:-122.68,zoom:11,headline:'You Must Appear White: United States v. Thind',text:'Three months after Ozawa, the Supreme Court considered Bhagat Singh Thind: a native of Punjab who had worked in an Oregon lumber mill to pay his way through UC Berkeley, and who had served honorably in the US Army in World War I. The court had ruled in Ozawa that Caucasian identity was required for citizenship. Thind was racially Caucasian. The court moved the goalposts: he did not appear white to the average American, and was therefore ineligible. South Asian lumber mill workers and farmworkers across the Pacific Northwest lost citizenship rights they had already obtained.',photo:'THIND',quote:{text:'What we suggest is merely racial difference, and it is of such character and extent that the great body of our people instinctively recognize it and reject the thought of assimilation.',cite:'Justice George Sutherland, United States v. Thind, 261 U.S. 204 (1923)'},video:null,sources:[{l:'United States v. Thind, 261 U.S. 204 (1923) · Justia',u:'https://supreme.justia.com/cases/federal/us/261/204/'},{l:'UC Berkeley: Echoes of Freedom — Bhagat Singh Thind',u:'https://guides.lib.berkeley.edu/echoes-of-freedom/bhagat-singh-thind'}],connects:[{l:'← Ozawa 1922: the same logic applied',i:8},{l:'→ Luce-Celler 1946: both exclusions reversed',i:20}]},
+  {sec:1,year:'1924',loc:'Hanapēpē, Kauaʻi',lat:21.9,lon:-159.6,zoom:10,headline:'The Hanapēpē Massacre: Striking Alone',text:'Filipino workers struck alone in 1924, without Japanese support. Pablo Manlapit led the High Wage Movement demanding $2/day. On September 9 at Hanapēpē, sixteen workers and four police officers died. The strike ended in total defeat. Manlapit was arrested, tried, and sentenced to prison; he was later paroled on the condition that he leave Hawaiʻi. The contrast with 1920 is the argument: interracial solidarity was not an ideal. Its absence was fatal.',photo:'HANAPEPE',quote:null,video:null,sources:[{l:'Asian American Education Project: 1924 Hanapēpē Massacre',u:'https://asianamericanedu.org/1924-hanapepe-massacre.html'},{l:'Densho: Strikers, Scabs, and Sugar Mongers',u:'https://densho.org/catalyst/strikers-scabs-sugar-mongers-immigrant-labor-struggle-shaped-hawaii-know-today/'}],connects:[{l:'← 1920: solidarity vs. isolation',i:7},{l:'→ LA 1927: Manlapit deported, continues organizing',i:11}]},
+  {sec:1,year:'1925–1927',loc:'Los Angeles, California',lat:34.05,lon:-118.25,zoom:10,headline:'Manlapit and the Laborer-Turned-Leader',text:'Pablo Manlapit arrived in Hawaiʻi in 1910 as a plantation laborer. He became Hawaiʻi’s first Filipino lawyer in 1919, organized two major strikes, and was deported. From Los Angeles he founded the Filipino Labor Union and launched a national speaking tour under the All-American Anti-Imperialist League. The journey from cane cutter to anti-colonial organizer is the arc of the Filipino migrant political imagination.',photo:'MANLAPIT',quote:{text:'This movement must keep faith in the common people rather than the imperialist and moneyed interest.',cite:'Pablo Manlapit, All-American Anti-Imperialist League speaking tour, 1927'},video:null,sources:[{l:'LOC: Manlapit Begins Filipino Labor Unions in U.S. (1927)',u:'https://www.loc.gov/resource/sn84020097/1927-11-26/ed-1/'},{l:'LOC: To Carry Filipino Message to American Workers (1927)',u:'https://www.loc.gov/resource/sn85053305/1927-12-16/ed-1/'},{l:'The Garden Island: Pablo Manlapit and the Hanapepe Massacre',u:'https://www.thegardenisland.com/2006/09/10/lifestyles/pablo-manlapit-and-the-hanapepe-massacre/'}],connects:[{l:'← Kauaʻi 1924: deportation routes him here',i:10},{l:'→ Section III: anti-imperialism as political imagination',i:23}]},
+  {sec:1,year:'1929',loc:'Seattle, Washington',lat:47.6,lon:-122.33,zoom:11,headline:'The Voice Before the Union',text:'Sebastian Abella arrived in Seattle as a University of Washington journalism student. He wrote about what he saw: Filipino migrant workers and students, economically desperate, racially excluded, legally vulnerable. The act of writing was itself organizing: naming the condition publicly as the precondition for demanding rights. Abella became part of the Filipino community in Seattle that would build the Cannery Workers’ and Farm Laborers’ Union four years later.',photo:'SEA1929',quote:null,video:null,sources:[{l:'LOC: Migration of Filipinos in the Pacific Northwest (1929)',u:'https://www.loc.gov/resource/sn88085780/1929-05-30/ed-1/'},{l:'UW Civil Rights and Labor: Cannery Workers Video Oral Histories',u:'https://depts.washington.edu/civilr/cannery_interviews.htm'}],connects:[{l:'→ Seattle 1936: Duyungan’s union',i:16}]},
+  {sec:1,year:'1930–1934',loc:'California (Multiple Sites)',lat:36.5,lon:-120.5,zoom:8,headline:'Multiethnic Strike Wave and the State’s Answer',text:'Eight thousand farmworkers struck California’s fields under the communist-affiliated TUUL in 1930: Mexican, Filipino, Hindu, Japanese, and Chinese laborers together. The state’s answer: deport the immigrant labor leaders. In 1933, cherry pickers in Santa Clara organized by CAWIU faced the National Guard. In 1934, Filipino lettuce workers in Salinas were shot at by landowner-hired gangsters, yet won wage increases to 40 cents per hour and formal union recognition after 28 days.',photo:'LANGE_SALINAS',quote:null,video:null,sources:[{l:'LOC: 8000 Mexican Agricultural Workers Strike (1930)',u:'https://www.loc.gov/resource/sn84020097/1930-01-06/ed-1/'},{l:'LOC: Strike At Salinas Turns Into Flop (1934)',u:'https://www.loc.gov/resource/sn92070146/1934-09-04/ed-1/'}],connects:[{l:'→ Watsonville 1930: violence alongside the strikes',i:14}]},
+  {sec:1,year:'1930',loc:'Watsonville, California',lat:36.91,lon:-121.75,zoom:12,headline:'Watsonville, January 1930: Violence and the Law’s Failure',text:'On January 19, 1930, hundreds of white men attacked Filipino farmworkers in Watsonville in a series of nightly assaults. On January 23, Fermin Tobera was shot and killed. Eight youths from prominent local families were convicted of the murder and sentenced to two years. The sentences were immediately suspended. The legal system’s failure to protect Filipino workers is the counterpoint to Yick Wo’s success 44 years earlier. The riots catalyzed Filipino union organizing in California’s fields and accelerated the movement for Philippine independence.',photo:'LANGE_CREW',quote:null,video:null,sources:[{l:'UCSC: Watsonville is in the Heart — historical map and oral history archive',u:'https://wiith-map.ucsc.edu/historicalmap/'},{l:'BenitoLink: A Look Back at the 1930 Watsonville Race Riots',u:'https://benitolink.com/a-look-back-at-history-the-1930-watsonville-race-riots/'},{l:'Positively Filipino: In the Heat of the Night',u:'https://www.positivelyfilipino.com/magazine/in-the-heat-of-the-night-the-exeter-and-watsonville-riots-1929-1930'}],connects:[{l:'← California strikes 1930: violence alongside labor action',i:13},{l:'→ CHLA 1933: same exclusion logic, different city',i:15}]},
+  {sec:1,year:'1933',loc:'Lower Manhattan, New York',lat:40.717,lon:-74.0,zoom:13,headline:'The Alliance is for the Laundrymen',text:'In April 1933, in response to punitive NYC licensing fees targeting Chinese laundry operators, 250 Chinese New Yorkers formed the Chinese Hand Laundry Alliance. Working fifteen-hour days, living in their storefronts, these men considered themselves laborers despite being nominally small businessmen. The CHLA connected local labor rights to global movements, supported Chinese communists, and survived FBI surveillance through the 1950s. On the other coast from the cane fields, the same exclusion produced the same response: organize.',photo:'CHLA',quote:null,video:null,sources:[{l:'Museum of the City of New York: Laundry Worker Activism',u:'https://www.mcny.org/story/laundry-worker-activism-era-chinese-exclusion'},{l:'Yu, Renqiu. To Save China, To Save Ourselves: The Chinese Hand Laundry Alliance of New York. Temple UP, 1992.',u:'https://tupress.temple.edu/books/9780877229407'}],connects:[{l:'← Yick Wo 1886: same population, 47 years later',i:2}]},
+  {sec:1,year:'1936',loc:'Seattle, Washington',lat:47.605,lon:-122.33,zoom:12,headline:'The Cost of Leadership',text:'On December 1, 1936, Virgil Duyungan, founding president of the Cannery Workers’ and Farm Laborers’ Union, was shot and killed alongside secretary Aurelio Simon at the Gyokko Ken Cafe in Seattle’s Chinatown. The killer, Baseda Patron, was the nephew of a labor contractor whose system Duyungan had dedicated his union to abolishing. Before dying, Duyungan shot his assailant, killing him. The assassinations paradoxically rallied the Filipino community around the union.',photo:'DUYUNGAN',quote:null,video:null,sources:[{l:'LOC: 3 Filipinos Dead in Gun Battle (1936)',u:'https://www.loc.gov/resource/sn87093377/1936-12-04/ed-1/'},{l:'UW: Murders of Virgil Duyungan and Aurelio Simon',u:'https://depts.washington.edu/depress/cannery_workers_union_murders.shtml'},{l:'Archives West: CWFLU Local 7 records',u:'https://archiveswest.orbiscascade.org/ark:/80444/xv82650'}],connects:[{l:'← Seattle 1929: Abella’s community becomes this union',i:12},{l:'→ Local 37 1946–55: Duyungan’s union carries forward',i:22}]},
+  {sec:1,year:'1939',loc:'Sacramento Delta, California',lat:38.05,lon:-121.55,zoom:9,headline:'FALA and the Asparagus Fields',text:'The Filipino Agricultural Laborers Association paralyzed harvesting on 2,000 acres of Delta land. Workers demanded 20 cents more per hundred pounds. They won. This is not a spontaneous action: it is the product of decades of accumulated organizing experience, from Oʻahu 1920 to Salinas 1934 to the asparagus rows of the Sacramento Delta. The win is small. The organizational memory behind it is vast.',photo:'LANGE_THIN',quote:null,video:null,sources:[{l:'LOC: Asparagus Cutters Walk Off of Jobs (1939)',u:'https://www.loc.gov/resource/sn92070146/1939-04-07/ed-1/'},{l:'Welga Digital Archive: Filipino American Farmworker History',u:'https://welgadigitalarchive.omeka.net/fafh'}],connects:[{l:'← Salinas 1934: organizational lineage',i:13}]},
+  {sec:2,year:'1935–1938',loc:'Washington, D.C.',lat:38.89,lon:-77.04,zoom:6,headline:'Context: The New Deal’s Excluded',text:'Section 2(3) of the National Labor Relations Act (Wagner Act, 1935) defined "employee" to exclude agricultural laborers: the majority of Asian migrant workers. The Social Security Act (1935) and Fair Labor Standards Act (1938) followed the same exclusion. At the same moment European industrial workers were entering the New Deal coalition and the CIO, the AFL was formally demanding the exclusion of Filipino workers from the United States. The New Deal drew a legal line. Asian, Black, and Mexican field laborers were on the outside by design.',photo:'NEWDEAL',quote:null,video:null,sources:[{l:'Cohen, Lizabeth. Making a New Deal: Industrial Workers in Chicago, 1919–1939. Cambridge UP, 1990.',u:'https://archive.org/details/makingnewdealind0000cohe_g2u0'},{l:'LOC: AFL Demands Barring of Filipino Labor (1933)',u:'https://www.loc.gov/resource/sn83045012/1933-12-08/ed-1/'}],connects:[{l:'← Oxnard 1903: AFL exclusion is the structural root',i:4},{l:'→ Luce-Celler 1946: the legislative answer, 11 years later',i:20}]},
+  {sec:1,year:'1942',loc:'Intermountain West',lat:43.0,lon:-114.0,zoom:6,headline:'Japanese American Labor Under Incarceration',text:'Sugar beet growers lobbied the War Relocation Authority to release incarcerated Japanese Americans from concentration camps for farm work. The WRA complied, but wages were routed through camp administrators, limiting worker autonomy. Workers labored under contracts treating them as racially inferior even as their labor was indispensable to the war economy. The wartime incarceration program is not a break in the labor history of Asian migrant workers: it is its logical extension.',photo:'WRA',quote:null,video:null,sources:[{l:'LOC: War-Time Demand of Japanese Labor (1942)',u:'https://www.loc.gov/resource/sn86075271/1942-04-09/ed-1/'},{l:'Densho Digital Repository: incarceration oral histories',u:'https://ddr.densho.org'}],connects:[{l:'→ Hawaiʻi 1946: postwar surge responds to wartime suppression',i:21}]},
+  {sec:1,year:'1946',loc:'Washington, D.C.',lat:38.895,lon:-77.035,zoom:10,headline:'July 2, 1946: The Right to Become American',text:'On July 2, 1946, two days before Philippine independence, President Truman signed the Luce-Celler Act. It reversed the Ozawa and Thind exclusions: for the first time, Filipinos and South Asians were eligible to naturalize as US citizens, with a quota of 100 immigrants per year from each country. More than 10,000 Filipinos already in the United States before 1934 could now naturalize. Sixty days later, Filipino plantation workers shut down 33 of Hawaiʻi’s 34 sugar plantations. The two events are not connected. But in the same summer of 1946, Filipino workers won the right to become citizens and won the most significant labor victory in Hawaiian history.',photo:'LUCECELL',quote:null,video:null,sources:[{l:'Luce-Celler Act full text (Pub. L. 79-483) · Immigration History',u:'https://immigrationhistory.org/item/luce-celler-act/'},{l:'Asian American Digital History Archive (Binghamton): Luce-Celler Act',u:'https://aadha.binghamton.edu/items/show/282'},{l:'SAGE Encyclopedia of Filipina/x/o American Studies: Luce-Celler Act',u:'https://sk.sagepub.com/ency/edvol/the-sage-encyclopedia-of-filipinx-american-studies/chpt/luce-celler-act-1946'}],connects:[{l:'← Ozawa 1922 + Thind 1923: exclusions reversed',i:8},{l:'→ Hawaiʻi 1946: same summer, labor victory',i:21}]},
+  {sec:1,year:'1946',loc:'Oʻahu, Hawaiʻi',lat:21.5,lon:-158.1,zoom:9,headline:'The Great Sugar Strike: Victory at Scale',text:'On September 1, 1946, more than 25,000 sugar workers began a 79-day strike that shut down 33 of Hawaiʻi’s 34 plantations. Japanese, Chinese, Filipino, Puerto Rican, Portuguese, and Kanaka Maoli workers organized under the ILWU. They held multilingual meetings, organized soup kitchens for thousands of families across four islands, and held the line. The strike ended November 17 with wage increases, an end to the perquisite system, and housing and medical care as contractual rights. It was built on forty-six years of failed strikes and accumulated memory.',photo:'ILWU46',quote:{text:'Never before had all the sugar workers of every ethnic group joined together in the same labor organization. Bitter lessons were learned from the unsuccessful 1909 and 1920 Japanese strikes and the 1920, 1924 and 1937 Filipino labor movements which failed because of ethnic unionism.',cite:'UH West Oʻahu CLEAR, 1946 Sugar Strike'},video:null,sources:[{l:'ILWU Local 142: The 1946 Sugar Strike',u:'https://www.ilwulocal142.org/1946-sugar-strike'},{l:'Wikipedia: Hawaiian Sugar Strike of 1946',u:'https://en.wikipedia.org/wiki/Hawaiian_sugar_strike_of_1946'},{l:'UH West Oʻahu CLEAR: 1946 Sugar Strike Timeline',u:'https://www.hawaii.edu/uhwo/clear/home/1946.html'}],connects:[{l:'← Oʻahu 1920: the multiethnic model finally wins',i:7},{l:'→ Local 37 1946–55: ILWU carries this forward',i:22}]},
+  {sec:1,year:'1946–1955',loc:'Seattle and Alaska',lat:47.62,lon:-122.35,zoom:11,headline:'Local 37 and the Vision of Labor Dignity',text:'The ILWU Local 37 Yearbook of 1952, edited by Carlos Bulosan in his role as Publicity Director, is one of the most remarkable documents of mid-century labor culture. It frames Filipino cannery workers not as marginal laborers but as active historical agents shaping the American labor movement. It links cannery wages to Philippine colonialism, union democracy to anti-imperialism. In 1955, Larry Itliong was elected to Local 37 leadership: a decade before Delano.',photo:'LOCAL37',quote:null,video:null,sources:[{l:'UW: 1952 Local 37 Yearbook (PDF)',u:'https://depts.washington.edu/civilr3/pdf/local37yearbook-op.pdf'},{l:'LOC: ILWU Local 37 Election Results (1955)',u:'https://www.loc.gov/resource/sn88085780/1955-10-14/ed-1/'},{l:'UW Civil Rights: Video Oral Histories (Cindy Domingo, David Della)',u:'https://depts.washington.edu/civilr/cannery_interviews.htm'}],connects:[{l:'← CWFLU 1936: Duyungan’s union becomes this',i:16},{l:'→ Section III: the Yearbook is the primary document',i:26}]},
+  {sec:3,year:'1898 onward',loc:'Manila, Philippines',lat:14.6,lon:121.0,zoom:6,headline:'You Cannot Separate the Laborer from the Colony',text:'Filipino workers arrived in Hawaiʻi not as free migrants but as colonial subjects, their migration shaped by US imperial control of the Philippines after 1898. Pablo Manlapit understood this: labor rights and national liberation were the same struggle. The sakada’s journey to Honolulu is inseparable from the USS Maine’s journey to Manila Bay. What looks like labor history is also colonial history, and both demand the same answer.',photo:'MANLAPIT',quote:null,video:null,sources:[{l:'ILWU Local 142: Honoring the Filipino Sakada',u:'https://www.ilwulocal142.org/honoring-filipino-sakada-part-i'},{l:'LOC: Manlapit Tours for Anti-Imperialists (1927)',u:'https://www.loc.gov/resource/sn85053305/1927-12-16/ed-1/'}],connects:[{l:'→ LA 1927: Manlapit names this connection',i:11}]},
+  {sec:3,year:'1943–1946',loc:'Central California',lat:36.5,lon:-119.5,zoom:8,headline:'America Is in the Heart',text:'Carlos Bulosan wrote from within the experience: hunger, discrimination, violence, and an irrepressible collective will. His reframing of America is not resignation. It is a demand. America is not yet what it claims to be; it could become so. This is the alternative imagination at its most literary: not a rejection of the American promise, but a claim on it from the periphery. Filipino workers were not a footnote to American history. They were its hidden center.',photo:'BULOSAN',quote:{text:'It is the most important record of the experience of the Filipino in America, but also a document of the human spirit under oppression.',cite:'Introduction to America Is in the Heart, 1946'},video:null,sources:[{l:'Bulosan: America Is in the Heart (HathiTrust)',u:'https://babel.hathitrust.org/cgi/pt?id=mdp.39015000566789&seq=1'}],connects:[{l:'→ Local 37 1952: Bulosan edits the Yearbook',i:22}]},
+  {sec:3,year:'1947–1950',loc:'Arvin, California',lat:35.2,lon:-118.83,zoom:10,headline:'DiGiorgio, 1947–1950: The Strike Before Delano',text:'Starting in September 1947, the National Farm Labor Union struck DiGiorgio Fruit Corporation, California’s largest grower, for 30 months. Filipino workers organized alongside Mexican workers under Ernesto Galarza. DiGiorgio responded by using bracero strikebreakers, manipulating press and politicians, and suing to suppress a documentary film workers made about their conditions. The House Un-American Activities Committee investigated the union. The strike failed. Eighteen years later, Larry Itliong and Cesar Chavez would win at the same corporation. The difference between 1947 and 1965 is three decades of accumulated organizational memory.',photo:'LANGE_SOLO',quote:null,video:null,sources:[{l:'People’s World: Filipino Migrants Gave Grape Strike its Radical Politics',u:'https://www.peoplesworld.org/article/filipino-migrants-gave-grape-strike-its-radical-politics/'},{l:'Cornell ILR Archives: Poverty in the Valley of Plenty (film)',u:'https://archives.library.cornell.edu/repositories/4/archival_objects/1394000'}],connects:[{l:'← Local 37 1952: same workers, same struggle',i:22},{l:'→ Delano 1965: same corporation, different outcome',i:28}]},
+  {sec:3,year:'1952',loc:'Seattle, Washington',lat:47.62,lon:-122.35,zoom:11,headline:'Local 37’s Internationalist Vision',text:'The ILWU Local 37 Yearbook synthesizes the political vision of the Filipino cannery workers’ movement: unionization as dignity, not just wages; education and cultural expression as tools of empowerment; labor organizing as anti-imperialism. The Yearbook openly attacked the Philippine government’s repression of leftist poets, urged solidarity with the Huk movement, and editorialized against US colonial domination of the Philippines. Filipino cannery workers assert themselves not as marginal laborers but as agents of history. This is the alternative imagination institutionalized.',photo:'LOCAL37',quote:null,video:null,sources:[{l:'UW: 1952 Local 37 Yearbook (PDF)',u:'https://depts.washington.edu/civilr3/pdf/local37yearbook-op.pdf'}],connects:[]},
+  {sec:3,year:'1983',loc:'San Francisco, California',lat:37.78,lon:-122.41,zoom:12,headline:'Korematsu Coram Nobis: The Law Reopens Its Own Error',text:'On January 19, 1983, a team of Japanese American lawyers organized pro bono filed a petition for writ of error coram nobis, seeking to reopen Fred Korematsu’s 40-year-old conviction for resisting wartime incarceration. Dale Minami, Lorraine Bannai, Dennis Hayashi, and Don Tamaki had found suppressed government evidence: military intelligence reports showing Japanese Americans posed no security threat had been intentionally destroyed. On November 10, 1983, Judge Marilyn Hall Patel vacated Korematsu’s conviction. The case was influential in the 1988 Civil Liberties Act, which apologized and granted reparations to Japanese Americans. When offered a presidential pardon, Korematsu replied: "We should be the ones pardoning the government."',photo:'CORAM83',quote:{text:'We should be the ones pardoning the government.',cite:'Fred Korematsu, rejecting the offer of a presidential pardon, 1983'},video:null,sources:[{l:'Densho Digital Repository: Coram Nobis Litigation Collection (ddr-densho-405)',u:'https://ddr.densho.org/ddr-densho-405/'},{l:'National Archives San Francisco: Motion to Vacate Conviction, Nov. 16, 1983',u:'https://www.archives.gov/san-francisco/highlights/korematsu'},{l:'Densho Encyclopedia: Coram Nobis Cases',u:'https://encyclopedia.densho.org/Coram_nobis_cases/'}],connects:[{l:'← WRA 1942: reopening the incarceration error',i:19},{l:'→ Delano 1965: legal organizing as collective action',i:28}]},
+  {sec:3,year:'1965 onward',loc:'Delano, California',lat:35.77,lon:-119.25,zoom:10,headline:'The Line from Delano to the Present',text:'On September 8, 1965, Larry Itliong and the Agricultural Workers Organizing Committee (AWOC) called the Delano grape strike with over 800 Filipino farmworkers in the fields called the Delano grape strike. Eight days later, Cesar Chavez’s NFWA joined. The United Farm Workers was born, built on decades of Filipino organizing experience routed through Hawaiʻi, California, and the Pacific Northwest canneries. Today nearly 800,000 AAPI workers are union members. APALA (founded 1992) and the UCLA Labor Center carry the multi-ethnic, anti-imperial tradition forward. The alternative imagination built in the periphery did not stay there.',photo:'ITLIONG',quote:{text:'The Constitution said that everybody has equal rights and justice. You have to make that come about. They are not going to give it to you.',cite:'Larry Itliong, 1970 (California Revealed oral history archive)'},video:{yt:'z7jcUrp13Ko',label:'Larry Itliong: PBS NewsHour / StoryCorps animated, Sept 1, 2024'},sources:[{l:'History.com: Delano Grape Strike Begins, September 8, 1965',u:'https://www.history.com/this-day-in-history/september-8/delano-grape-strike-begins-ufw'},{l:'AFL-CIO: Enduring Legacy of AAPI Workers (2024)',u:'https://aflcio.org/2024/5/3/enduring-legacy-asian-american-pacific-islander-workers-and-union-leaders'},{l:'UCLA Labor Center: Asian American Racial Justice',u:'https://labor.ucla.edu/our-projects/asian-american-racial-justice/'},{l:'California Revealed: Interview with Larry Itliong (1970)',u:'https://californiarevealed.org/do/2f9d49a2-76ab-4d41-ae83-6e321ae05a55'}],connects:[{l:'← Local 37 1952: Larry Itliong’s origin',i:22}]}
+];
+
+// ─── MAP ──────────────────────────────────────────────────────────────────────
+var map = null, markers = [], cur = 0;
+
+function initMap() {
+  if (typeof L === "undefined") throw new Error("Leaflet not loaded");
+  map = L.map("map", {zoomControl:false, attributionControl:true});
+  L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+    attribution: 'OpenStreetMap contributors, HOT tiles',
+    maxZoom: 19, subdomains: "abc"
+  }).addTo(map);
+  map.setView([SLIDES[0].lat, SLIDES[0].lon], SLIDES[0].zoom);
+  SLIDES.forEach(function(s, i) {
+    if (!s.lat) return;
+    var el = document.createElement("div");
+    el.className = "mpast";
+    var icon = L.divIcon({className:"", html:el.outerHTML, iconSize:[8,8], iconAnchor:[4,4]});
+    var mk = L.marker([s.lat, s.lon], {icon:icon}).addTo(map);
+    if (s.loc) mk.bindPopup(s.loc, {closeButton:false, autoClose:false, closeOnClick:false});
+    (function(slideIdx) {
+      mk.on("click", function() { if (cur === 0 && slideIdx > 0) jump(slideIdx); });
+    })(i);
+    markers.push({mk:mk, idx:i});
+  });
+}
+
+function setMarkers(idx) {
+  if (!map) return;
+  var isOverview = (idx === 0);
+  markers.forEach(function(m) {
+    var el = document.createElement("div");
+    if (isOverview) {
+      // Title slide: show all locations colour-coded by section
+      var s = SLIDES[m.idx];
+      if (!s || !s.lat) return;
+      var cls = s.sec === 1 ? "mov-s1" : s.sec === 2 ? "mov-s2" : s.sec === 3 ? "mov-s3" : "mpast";
+      el.className = cls;
+      m.mk.setIcon(L.divIcon({className:"", html:el.outerHTML, iconSize:[10,10], iconAnchor:[5,5]}));
+      m.mk.closePopup();
+    } else {
+      var isCur = m.idx === idx;
+      var isPast = m.idx <= idx;
+      el.className = isCur ? "mcur" : "mpast";
+      el.style.opacity = isPast ? "1" : "0.3";
+      m.mk.setIcon(L.divIcon({className:"", html:el.outerHTML,
+        iconSize: isCur ? [14,14] : [8,8],
+        iconAnchor: isCur ? [7,7] : [4,4]}));
+      if (isCur && m.mk.getPopup()) m.mk.openPopup();
+      else if (!isCur && m.mk.getPopup()) m.mk.closePopup();
+    }
+  });
+}
+
+function flyTo(idx) {
+  var s = SLIDES[idx];
+  if (map && s.lat) {
+    try { map.flyTo([s.lat, s.lon], s.zoom, {duration:1.4, easeLinearity:0.2}); } catch(e) {}
+  }
+}
+
+
+// ─── SCHOLARLY CITATIONS (Chicago, per slide index) ──────────────────────────
+
+// -- SCHOLARLY CITATIONS (Chicago, per slide index) --
+var CITATIONS = {
+  1: [
+    "Museum of Chinese in America. \u201cRailroad\u2014Chinese Labor Strike, June 24th, 1867.\u201d <a href='https://www.mocanyc.org/collections/stories/railroad-chinese-labor-strike-june-24th-1867/' target='_blank'>mocanyc.org</a>",
+    "Stanford Chinese Railroad Workers in North America Project. \u201cVirtual Museum.\u201d <a href='https://web.stanford.edu/group/chineserailroad/cgi-bin/website/virtual/' target='_blank'>stanford.edu</a>",
+    "Obenzinger, Hilton. Quoted in NBC News: \u201c150 Years Ago, Chinese Railroad Workers Staged the Era\u2019s Largest Labor Strike.\u201d June 25, 2017."
+  ],
+  2: [
+    "Yick Wo v. Hopkins, 118 U.S. 356 (1886). Justia. <a href='https://supreme.justia.com/cases/federal/us/118/356/' target='_blank'>justia.com</a>",
+    "SF Standard. \u201cYick Wo 140th Anniversary.\u201d May 10, 2026. <a href='https://sfstandard.com/2026/05/10/yick-wo-140-anniversary/' target='_blank'>sfstandard.com</a>",
+    "Note: The petitioner\u2019s name was Lee Yick; \u201cYick Wo\u201d was the name of his laundry (\u76ca\u548c). The Chinese Six Companies (Consolidated Benevolent Association) funded the litigation. Sources: Wikipedia; SF Standard."
+  ],
+  3: [
+    "LOC Classroom Materials. \u201cHawaii: Life in a Plantation Society.\u201d <a href='https://www.loc.gov/classroom-materials/immigration/japanese/hawaii-life-in-a-plantation-society/' target='_blank'>loc.gov</a>",
+    "Beechert, Edward D. Working in Hawaii: A Labor History. Honolulu: University of Hawai\u02BBi Press, 1985.",
+    "Note: The \u201cwave of spontaneous strikes\u201d framing is confirmed by LOC and Beechert; the specific figure of \u201ctwenty\u201d strikes in 1900 is unconfirmed by named source."
+  ],
+  4: [
+    "\u201cJaps and Mexicans Unionized.\u201d Ventura Free Press, April 3, 1903. LOC Chronicling America. <a href='https://www.loc.gov/resource/sn93051660/1903-04-03/ed-1/' target='_blank'>loc.gov</a>",
+    "Wikipedia: Oxnard Strike of 1903. <a href='https://en.wikipedia.org/wiki/Oxnard_strike_of_1903' target='_blank'>wikipedia.org</a>",
+    "Almaguer, Tom\u00e1s. \u201cRacial Domination and Class Conflict in Capitalist Agriculture: The Oxnard Sugar Beet Workers\u2019 Strike of 1903.\u201d Labor History 25, no. 3 (1984): 325\u2013350."
+  ],
+  5: [
+    "Riordan, William L. Plunkitt of Tammany Hall. New York: McClure, Phillips, 1905. Project Gutenberg. <a href='https://www.gutenberg.org/ebooks/2810' target='_blank'>gutenberg.org</a>",
+    "Note: This slide is a \u201cContext\u201d slide, positioned as a contrast to the JMLA\u2019s exclusion from the AFL. The contrast is structural, not a claim of equivalence."
+  ],
+  6: [
+    "UH CLEAR / Honolulu Record. \u201cJapanese Workers Struck For Equal Pay For Equal Work.\u201d <a href='https://www.hawaii.edu/uhwo/clear/HonoluluRecord/articles/v10n42/Japanese%20Workers%20Struck%20For%20Equal%20Pay%20For%20Equal%20Work.html' target='_blank'>hawaii.edu</a>",
+    "Densho. \u201cStrikers, Scabs, and Sugar Mongers.\u201d December 7, 2023. <a href='https://densho.org/catalyst/strikers-scabs-sugar-mongers-immigrant-labor-struggle-shaped-hawaii-know-today/' target='_blank'>densho.org</a>",
+    "HDNP Blog. \u201cLabor Strikes in Hawaii.\u201d <a href='https://hdnpblog.wordpress.com/historical-articles/labor-strikes/' target='_blank'>hdnpblog.wordpress.com</a>",
+    "Note: The 1909 strikebreakers were Korean, Portuguese, Chinese, and Hawaiian workers (confirmed: Densho, HDNP). Filipino workers were NOT 1909 strikebreakers; their recruitment was the plantation\u2019s long-term response to the strike."
+  ],
+  7: [
+    "\u201cSugar Farms Tied Up.\u201d Pacific Commercial Advertiser, January 28, 1920. LOC Chronicling America.",
+    "Duus, Masayo. The Japanese Conspiracy: The Oahu Sugar Strike of 1920. Berkeley: University of California Press, 1999.",
+    "Kuykendall and Day, cited in: \u201cLooking Back at the 1918\u20131920 Spanish Flu Epidemic in Hawaii.\u201d ilind.net. Confirms: 12,000 evicted; estimated 1,200 family members died. <a href='https://www.ilind.net/2020/03/30/looking-back-at-the-1918-1920-spanish-flu-epidemic-in-hawaii/' target='_blank'>ilind.net</a>",
+    "LOC Classroom Materials confirms: Hawaii Laborers\u2019 Association formed \u201cafterwards\u201d from the 1920 organizing. <a href='https://www.loc.gov/classroom-materials/immigration/japanese/hawaii-life-in-a-plantation-society/' target='_blank'>loc.gov</a>"
+  ],
+  8: [
+    "Ozawa v. United States, 260 U.S. 178 (1922). Justia. <a href='https://supreme.justia.com/cases/federal/us/260/178/' target='_blank'>justia.com</a>",
+    "Teaching Legal History: \u201cLegalizing Whiteness.\u201d <a href='https://teachinglegalhistory.unl.edu/s/oer/item/2127' target='_blank'>teachinglegalhistory.unl.edu</a>"
+  ],
+  9: [
+    "United States v. Thind, 261 U.S. 204 (1923). Justia. <a href='https://supreme.justia.com/cases/federal/us/261/204/' target='_blank'>justia.com</a>",
+    "UC Berkeley Libraries. \u201cEchoes of Freedom: South Asian Pioneers in California\u2014Bhagat Singh Thind.\u201d <a href='https://guides.lib.berkeley.edu/echoes-of-freedom/bhagat-singh-thind' target='_blank'>guides.lib.berkeley.edu</a>"
+  ],
+  10: [
+    "Asian American Education Project. \u201c1924 Hanap\u0113p\u0113 Massacre.\u201d <a href='https://asianamericanedu.org/1924-hanapepe-massacre.html' target='_blank'>asianamericanedu.org</a>",
+    "ILWU Local 142. \u201cA Bloody Day in Hawai\u02BBi\u2019s Labor History.\u201d <a href='https://www.ilwulocal142.org/bloody-day-hawaiis-labor-history-marker-dedicated-1924-hanapepe-massacre' target='_blank'>ilwulocal142.org</a>",
+    "Note: Manlapit obtained his law license to practice in district courts in 1919 (The Garden Island, 2006). He was the first Filipino to practice law in Hawai\u02BBi."
+  ],
+  11: [
+    "\u201cManlapit Begins Filipino Labor Unions in U.S.\u201d Daily Worker, November 26, 1927. LOC Chronicling America.",
+    "\u201cTo Carry Filipino Message to American Workers.\u201d The Producers News, December 16, 1927. LOC Chronicling America.",
+    "The Garden Island: \u201cPablo Manlapit and the Hanapepe Massacre.\u201d September 10, 2006. <a href='https://www.thegardenisland.com/2006/09/10/lifestyles/pablo-manlapit-and-the-hanapepe-massacre/' target='_blank'>thegardenisland.com</a>",
+    "Batangas History: \u201cPablo Manlapit.\u201d 2018. Confirms 1910 arrival. <a href='https://www.batangashistory.date/2018/03/manlapit.html' target='_blank'>batangashistory.date</a>"
+  ],
+  12: [
+    "\u201cMigration of Filipinos in the Pacific Northwest.\u201d Seattle Star, May 30, 1929. LOC Chronicling America. <a href='https://www.loc.gov/resource/sn88085780/1929-05-30/ed-1/' target='_blank'>loc.gov</a>",
+    "UW Civil Rights and Labor History Consortium. Video Oral Histories. <a href='https://depts.washington.edu/civilr/cannery_interviews.htm' target='_blank'>depts.washington.edu</a>",
+    "Note: Sebastian Abella as a \u201cfounding member\u201d of CWFLU is unconfirmed by a specific named source. The WA Secretary of State source lists \u201cCasamiro Abella\u201d among union figures. The slide text has been softened to \u201cmember of the community that built the CWFLU.\u201d"
+  ],
+  13: [
+    "\u201c8000 Mexican Agricultural Workers Strike in Cal.\u201d Daily Worker, January 6, 1930. LOC Chronicling America.",
+    "\u201cStrike At Salinas \u2018Turns Into Flop.\u2019\u201d Imperial Valley Press, September 4, 1934. LOC Chronicling America.",
+    "Weber, Devra. Dark Sweat, White Gold: California Farm Workers, Cotton, and the New Deal. Berkeley: UC Press, 1994."
+  ],
+  14: [
+    "UCSC \u201cWatsonville is in the Heart\u201d historical map. <a href='https://wiith-map.ucsc.edu/historicalmap/' target='_blank'>wiith-map.ucsc.edu</a>",
+    "BenitoLink: \u201cA Look Back at the 1930 Watsonville Race Riots.\u201d <a href='https://benitolink.com/a-look-back-at-history-the-1930-watsonville-race-riots/' target='_blank'>benitolink.com</a>",
+    "Grokipedia: Watsonville Riots. <a href='https://grokipedia.com/page/Watsonville_riots' target='_blank'>grokipedia.com</a>. Confirms: January 19\u201323, 1930; Fermin Tobera killed Jan. 23; eight youths convicted; sentences suspended."
+  ],
+  15: [
+    "Museum of the City of New York. \u201cLaundry Worker Activism in the Era of Chinese Exclusion.\u201d <a href='https://www.mcny.org/story/laundry-worker-activism-era-chinese-exclusion' target='_blank'>mcny.org</a>",
+    "Yu, Renqiu. To Save China, To Save Ourselves: The Chinese Hand Laundry Alliance of New York. Philadelphia: Temple UP, 1992."
+  ],
+  16: [
+    "UW Special Collections. CWFLU finding aid. Confirms: December 1, 1936; Gyokko Ken Cafe, Seattle\u2019s Chinatown; Baseda Patron killed Duyungan and Simon; Duyungan shot Patron before dying. <a href='https://static.lib.uw.edu/static/public/specialcollections/findingaids/3927-001.pdf' target='_blank'>lib.uw.edu</a>",
+    "Archives West: CWFLU Local 7 records. <a href='https://archiveswest.orbiscascade.org/ark:/80444/xv82650' target='_blank'>archiveswest.orbiscascade.org</a>",
+    "HistoryLink: Filipino Cannery Workers. <a href='https://www.historylink.org/File/411' target='_blank'>historylink.org</a>. Confirms: \u201cBefore dying, Duyungan managed to shoot his assailant, killing him.\u201d"
+  ],
+  17: [
+    "\u201cAsparagus Cutters Walk Off of Jobs.\u201d San Francisco Examiner, April 7, 1939. LOC Chronicling America. <a href='https://www.loc.gov/resource/sn92070146/1939-04-07/ed-1/' target='_blank'>loc.gov</a>",
+    "Welga Digital Archive. <a href='https://welgadigitalarchive.omeka.net/fafh' target='_blank'>welgadigitalarchive.omeka.net</a>"
+  ],
+  18: [
+    "Cohen, Lizabeth. Making a New Deal: Industrial Workers in Chicago, 1919\u20131939. Cambridge: Cambridge UP, 1990. <a href='https://archive.org/details/makingnewdealind0000cohe_g2u0' target='_blank'>archive.org</a>",
+    "Note on NLRA exclusion: Agricultural workers were excluded via Section 2(3), which defines \u2018employee\u2019 to exclude \u2018any individual employed as an agricultural laborer\u2019. Not Section 13 (which concerns the right to strike). See: Linder, Marc. \u2018Farm Workers and the Fair Labor Standards Act.\u2019 Texas Law Review 65 (1987): 1335.",
+    "\u201cQuotas Upheld and Barring of Filipino Labor Demanded.\u201d Washington Post, December 8, 1933. LOC Chronicling America. <a href='https://www.loc.gov/resource/sn83045012/1933-12-08/ed-1/' target='_blank'>loc.gov</a>"
+  ],
+  19: [
+    "\u201cWar-Time Demand of Japanese Labor.\u201d Ogden Standard-Examiner, April 9, 1942. LOC Chronicling America. <a href='https://www.loc.gov/resource/sn86075271/1942-04-09/ed-1/' target='_blank'>loc.gov</a>",
+    "Densho Digital Repository. Oral histories on wartime agricultural labor. <a href='https://ddr.densho.org' target='_blank'>ddr.densho.org</a>"
+  ],
+  20: [
+    "Luce-Celler Act, Pub. L. 79-483, 60 Stat. 416 (July 2, 1946). Full text: Immigration History. <a href='https://immigrationhistory.org/item/luce-celler-act/' target='_blank'>immigrationhistory.org</a>",
+    "Asian American Digital History Archive (Binghamton). <a href='https://aadha.binghamton.edu/items/show/282' target='_blank'>aadha.binghamton.edu</a>",
+    "SAGE Encyclopedia of Filipina/x/o American Studies: Luce-Celler Act. Confirms: signed July 2, 1946; Philippines independent July 4, 1946; 10,000+ Filipinos able to naturalize; quota 100/year."
+  ],
+  21: [
+    "Wikipedia: Hawaiian Sugar Strike of 1946. <a href='https://en.wikipedia.org/wiki/Hawaiian_sugar_strike_of_1946' target='_blank'>wikipedia.org</a>. Confirms: September 1, 1946; 25,000+ workers; 33 of 34 plantations; 79 days; ended November 17, 1946.",
+    "UH West O\u02BBahu CLEAR. <a href='https://www.hawaii.edu/uhwo/clear/home/1946.html' target='_blank'>hawaii.edu</a>",
+    "ILWU Local 142: The 1946 Sugar Strike. <a href='https://www.ilwulocal142.org/1946-sugar-strike' target='_blank'>ilwulocal142.org</a>"
+  ],
+  22: [
+    "Bulosan, Carlos, ed. ILWU Local 37 Yearbook 1952. Seattle: ILWU Local 37, 1952. UW Civil Rights. <a href='https://depts.washington.edu/civilr3/pdf/local37yearbook-op.pdf' target='_blank'>depts.washington.edu</a>",
+    "UW Libraries: \u201cAuthor, Poet, and Worker: The World of Carlos Bulosan.\u201d Confirms: Bulosan became Publicity Director, edited the 52-page Yearbook. <a href='https://content.lib.washington.edu/exhibits/bulosan/ilwu.html' target='_blank'>content.lib.washington.edu</a>",
+    "LOC: ILWU Local 37 Election Results (1955). <a href='https://www.loc.gov/resource/sn88085780/1955-10-14/ed-1/' target='_blank'>loc.gov</a>"
+  ],
+  23: [
+    "ILWU Local 142. \u201cHonoring the Filipino Sakada.\u201d <a href='https://www.ilwulocal142.org/honoring-filipino-sakada-part-i' target='_blank'>ilwulocal142.org</a>",
+    "Ngai, Mae M. Impossible Subjects: Illegal Aliens and the Making of Modern America. Princeton UP, 2004. Covers Filipino colonial status and labor."
+  ],
+  24: [
+    "Bulosan, Carlos. America Is in the Heart: A Personal History. New York: Harcourt, Brace, 1946. HathiTrust. <a href='https://babel.hathitrust.org/cgi/pt?id=mdp.39015000566789&seq=1' target='_blank'>babel.hathitrust.org</a>",
+    "San Juan, E., Jr. Carlos Bulosan and the Imagination of the Class Struggle. Quezon City: University of the Philippines Press, 1972."
+  ],
+  25: [
+    "People\u2019s World: \u201cFilipino Migrants Gave Grape Strike its Radical Politics.\u201d May 3, 2018. <a href='https://www.peoplesworld.org/article/filipino-migrants-gave-grape-strike-its-radical-politics/' target='_blank'>peoplesworld.org</a>",
+    "Cornell ILR Archives: \u201cPoverty in the Valley of Plenty\u201d (film). <a href='https://archives.library.cornell.edu/repositories/4/archival_objects/1394000' target='_blank'>archives.library.cornell.edu</a>",
+    "EBSCO: Ch\u00e1vez and Huerta Form Farmworkers\u2019 Union. Confirms: September 1947 start, 30 months, HUAC investigation, bracero strikebreakers."
+  ],
+  26: [
+    "Bulosan, Carlos, ed. ILWU Local 37 Yearbook 1952. <a href='https://depts.washington.edu/civilr3/pdf/local37yearbook-op.pdf' target='_blank'>depts.washington.edu</a>",
+    "Asia-Pacific Journal: \u201cComrade Carlos Bulosan: U.S. State Surveillance and the Cold War Suppression of Filipino Radicals.\u201d <a href='https://apjjf.org/2014/11/33/Rick-Baldoz/4165/article' target='_blank'>apjjf.org</a>"
+  ],
+  27: [
+    "Densho Digital Repository. Coram Nobis Litigation Collection (ddr-densho-405). Free of known copyright restrictions. <a href='https://ddr.densho.org/ddr-densho-405/' target='_blank'>ddr.densho.org</a>",
+    "National Archives San Francisco: Motion to Vacate Conviction and Dismiss Indictment of Fred T. Korematsu, November 16, 1983. <a href='https://www.archives.gov/san-francisco/highlights/korematsu' target='_blank'>archives.gov</a>",
+    "Densho Encyclopedia: Coram Nobis Cases. <a href='https://encyclopedia.densho.org/Coram_nobis_cases/' target='_blank'>encyclopedia.densho.org</a>. Confirms: filed January 19, 1983; Judge Marilyn Hall Patel; conviction vacated November 10, 1983."
+  ],
+  28: [
+    "History.com: \u201cDelano Grape Strike Begins, September 8, 1965.\u201d Confirms: September 8, 1965; over 2,000 AWOC members; initial strikers ~800 (Farmworker Movement documentation). <a href='https://www.history.com/this-day-in-history/september-8/delano-grape-strike-begins-ufw' target='_blank'>history.com</a>",
+    "ACoM: \u201cLarry Itliong and the Great Delano Grape Strike.\u201d Confirms: \u201ctwo weeks later\u201d is incorrect; NFWA joined eight days later (September 16). <a href='https://americancommunitymedia.org/immigration/larry-itliong-and-the-great-delano-grape-strike/' target='_blank'>americancommunitymedia.org</a>",
+    "California Revealed: Interview with Larry Itliong (1970). Source for confirmed Itliong quote. <a href='https://californiarevealed.org/do/2f9d49a2-76ab-4d41-ae83-6e321ae05a55' target='_blank'>californiarevealed.org</a>",
+    "AFL-CIO: \u201cEnduring Legacy of AAPI Workers\u201d (2024). <a href='https://aflcio.org/2024/5/3/enduring-legacy-asian-american-pacific-islander-workers-and-union-leaders' target='_blank'>aflcio.org</a>"
+  ]
+};
+
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+var SEC_LABELS = {
+  0: "Introduction",
+  1: "Section I, From Sparks to Movements",
+  2: "Context",
+  3: "Section III, An Alternative Imagination"
+};
+
+function render(idx) {
+  var s = SLIDES[idx];
+  var inner = document.getElementById("slide-inner");
+  inner.classList.add("out");
+  setTimeout(function() {
+    inner.classList.remove("out");
+    document.getElementById("yr-bg").textContent = s.year || "";
+    var h = "";
+
+    // meta
+    h += '<div class="slide-meta">'
+      + '<span class="sec-pill s' + s.sec + '">' + SEC_LABELS[s.sec] + '</span>'
+      + (s.year ? '<span class="slide-year">' + s.year + '</span>' : '')
+      + '</div>';
+    if (s.loc) h += '<div class="slide-loc">' + s.loc + '</div>';
+
+    if (s.isTitle) {
+      h += '<div class="rule"></div>';
+      h += '<div class="title-h">' + s.headline + '</div>';
+      h += '<div class="title-sub">' + s.sub + '</div>';
+      h += '<p class="body-text">' + s.text + '</p>';
+      var leg = '<div class="intro-legend">';
+      leg += '<div class="intro-legend-title">Map key</div>';
+      leg += '<div class="intro-legend-row"><div class="intro-legend-dot" style="background:#C4922A"></div><div><div class="intro-legend-text">I: From Sparks to Movements</div><div class="intro-legend-period">1867 - 1955 &middot; Hawaii, California, Pacific Northwest, New York</div></div></div>';
+      leg += '<div class="intro-legend-row"><div class="intro-legend-dot" style="background:#5b9bd5"></div><div><div class="intro-legend-text">Context: European Path</div><div class="intro-legend-period">Two contrast slides &middot; Manhattan, D.C. &middot; click dot to navigate</div></div></div>';
+      leg += '<div class="intro-legend-row"><div class="intro-legend-dot" style="background:#CF0A2C"></div><div><div class="intro-legend-text">III: An Alternative Imagination</div><div class="intro-legend-period">1898 - Today &middot; Philippines, California, Seattle</div></div></div>';
+      leg += '<div class="intro-legend-note">Click any dot on the map to jump to that event. Use \u2190 \u2192 arrow keys, click the progress bar, or the buttons below to navigate between slides.</div>';
+      leg += '</div>';
+      h += leg;
+    } else {
+      // photo
+      if (s.photo && P[s.photo]) {
+        var ph = P[s.photo];
+        var pw = '<div class="photo-wrap">';
+        pw += '<img src="' + ph[0] + '" alt="' + s.headline + '" onerror="this.style.display=\'none\'">';
+        var capCls = (ph[1] && ph[1].indexOf('[Contextual]') === 0) ? 'photo-cap ctx-cap' : 'photo-cap';
+        var capTxt = ph[1] ? ph[1].replace('[Contextual] ', '') : '';
+        pw += '<div class="' + capCls + '">' + capTxt + '</div>';
+        pw += '</div>';
+        h += pw;
+      }
+      h += '<h2 class="headline">' + s.headline + '</h2>';
+      h += '<p class="body-text">' + s.text + '</p>';
+      if (s.quote) {
+        h += '<blockquote class="quote"><p>\u201c' + s.quote.text + '\u201d</p>'
+          + '<cite>: ' + s.quote.cite + '</cite></blockquote>';
+      }
+      if (s.sources && s.sources.length) {
+        h += '<div class="sources">';
+        s.sources.forEach(function(src) {
+          h += '<a class="src-link" href="' + src.u + '" target="_blank" rel="noopener">' + src.l + '</a>';
+        });
+        h += '</div>';
+      }
+      if (CITATIONS[idx] && CITATIONS[idx].length) {
+        h += '<button class="sn-toggle" onclick="toggleSN(this)">';
+        h += '<span class="sn-toggle-arrow">&#9656;</span> Scholarly Notes</button>';
+        h += '<div class="sn-panel">';
+        h += '<div class="sn-label">Chicago citations</div>';
+        CITATIONS[idx].forEach(function(cite) {
+          h += '<div class="sn-item">' + cite + '</div>';
+        });
+        h += '</div>';
+      }
+      if (s.video) {
+        h += '<button class="vid-btn" data-yt="' + s.video.yt + '" data-label="' + s.video.label + '" onclick="openVidBtn(this)">Watch Documentary</button>';
+      }
+      if (s.connects && s.connects.length) {
+        h += '<div class="connects"><div class="cl">Connects to</div><div class="ctags">';
+        s.connects.forEach(function(c) {
+          h += '<span class="ctag" onclick="jump(' + c.i + ')">' + c.l + '</span>';
+        });
+        h += '</div></div>';
+      }
+    }
+
+    inner.innerHTML = h;
+    document.getElementById("slide-scroll").scrollTop = 0;
+    flyTo(idx);
+    setMarkers(idx);
+    var leg = document.getElementById("map-legend");
+    if (leg) { if (idx === 0) leg.classList.add("visible"); else leg.classList.remove("visible"); }
+    updateNav(idx);
+    updateSecNav(s.sec);
+  }, idx === cur ? 0 : 220);
+}
+
+function updateNav(idx) {
+  var total = SLIDES.length;
+  document.getElementById("counter").textContent = (idx+1) + " / " + total;
+  document.getElementById("prev").disabled = (idx === 0);
+  document.getElementById("next").disabled = (idx === total-1);
+  document.getElementById("prog-bar").style.width = ((idx/(total-1))*100) + "%";
+}
+
+function updateSecNav(sec) {
+  document.querySelectorAll(".sec-btn").forEach(function(b, i) {
+    b.className = "sec-btn";
+    if (i+1 === sec) b.classList.add("act-s" + sec);
+  });
+}
+
+function go(dir) { jump(cur + dir); }
+function jump(idx) {
+  if (idx < 0 || idx >= SLIDES.length) return;
+  cur = idx; render(cur);
+}
+function jumpSec(sec) {
+  var idx = SLIDES.findIndex(function(s) { return s.sec === sec; });
+  if (idx >= 0) jump(idx);
+}
+function progClick(e) {
+  var r = e.currentTarget.getBoundingClientRect();
+  jump(Math.round((e.clientX - r.left) / r.width * (SLIDES.length - 1)));
+}
+
+document.addEventListener("keydown", function(e) {
+  if (e.key === "ArrowRight" || e.key === "ArrowDown") go(1);
+  if (e.key === "ArrowLeft"  || e.key === "ArrowUp")   go(-1);
+});
+
+// ─── VIDEO MODAL ─────────────────────────────────────────────────────────────
+function openVidBtn(btn) {
+  var ytId = btn.getAttribute("data-yt");
+  var label = btn.getAttribute("data-label");
+  document.getElementById("vid-frame").src = "https://www.youtube.com/embed/" + ytId + "?autoplay=1&rel=0";
+  document.getElementById("vid-meta").textContent = label;
+  document.getElementById("vid-modal").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeVidBtn() {
+  document.getElementById("vid-frame").src = "";
+  document.getElementById("vid-modal").classList.remove("open");
+  document.body.style.overflow = "";
+}
+function closeVid(e) {
+  if (e.target === document.getElementById("vid-modal")) closeVidBtn();
+}
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") closeVidBtn();
+});
+
+
+// ─── SCHOLARLY NOTES TOGGLE ───────────────────────────────────────────────────
+function toggleSN(btn) {
+  var panel = btn.nextElementSibling;
+  var isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+}
+
+
+// -- PRIMARY SOURCES DATA --
+var SOURCES = {
+  loc_newspapers: {
+    label: 'LOC Chronicling America — Newspapers',
+    items: [
+      {title: 'Japs and Mexicans Unionized (1903)', event: '1903 Oxnard Strike', slide: 4, img: 'https://chroniclingamerica.loc.gov/lccn/sn93051660/1903-04-03/ed-1/seq-1/thumbnail.jpg', desc: 'Ventura Free Press, April 3, 1903. Documents JMLA formation.', url: 'https://www.loc.gov/resource/sn93051660/1903-04-03/ed-1/'},
+      {title: 'Armed Japanese Attend Funeral (1903)', event: '1903 Oxnard Strike', slide: 4, img: null, desc: 'Los Angeles Herald, March 28, 1903. Luis Vasquez funeral; Japanese-Mexican solidarity.', url: 'https://chroniclingamerica.loc.gov/lccn/sn85066387/1903-03-28/ed-1/seq-2/'},
+      {title: 'Sugar Farms Tied Up (1920)', event: '1920 Hawaii Strike', slide: 7, img: 'https://chroniclingamerica.loc.gov/lccn/sn84020645/1920-01-28/ed-1/seq-1/thumbnail.jpg', desc: 'Pacific Commercial Advertiser, Jan. 28, 1920.', url: 'https://www.loc.gov/resource/sn84020645/1920-01-28/ed-1/'},
+      {title: 'Filipinos Sugar Farm Workers Strike (1920)', event: '1920 Hawaii Strike', slide: 7, img: 'https://chroniclingamerica.loc.gov/lccn/sn84024808/1920-01-21/ed-1/seq-1/thumbnail.jpg', desc: 'Honolulu Star-Bulletin, Jan. 21, 1920.', url: 'https://www.loc.gov/resource/sn84024808/1920-01-21/ed-1/'},
+      {title: 'Manlapit Begins Filipino Labor Unions in U.S. (1927)', event: 'Manlapit in Los Angeles', slide: 11, img: 'https://chroniclingamerica.loc.gov/lccn/sn84020097/1927-11-26/ed-1/seq-1/thumbnail.jpg', desc: 'The Daily Worker, Nov. 26, 1927.', url: 'https://www.loc.gov/resource/sn84020097/1927-11-26/ed-1/'},
+      {title: 'Migration of Filipinos in the Pacific Northwest (1929)', event: 'Seattle 1929', slide: 12, img: 'https://chroniclingamerica.loc.gov/lccn/sn88085780/1929-05-30/ed-1/seq-1/thumbnail.jpg', desc: 'Seattle Star, May 30, 1929. Sebastian Abella article.', url: 'https://www.loc.gov/resource/sn88085780/1929-05-30/ed-1/'},
+      {title: '8000 Mexican Agricultural Workers Strike (1930)', event: 'California Strikes 1930–34', slide: 13, img: 'https://chroniclingamerica.loc.gov/lccn/sn84020097/1930-01-06/ed-1/seq-1/thumbnail.jpg', desc: 'The Daily Worker, Jan. 6, 1930.', url: 'https://www.loc.gov/resource/sn84020097/1930-01-06/ed-1/'},
+      {title: 'Strike At Salinas Turns Into Flop (1934)', event: 'California Strikes 1930–34', slide: 13, img: 'https://chroniclingamerica.loc.gov/lccn/sn92070146/1934-09-04/ed-1/seq-1/thumbnail.jpg', desc: 'Imperial Valley Press, Sept. 4, 1934.', url: 'https://www.loc.gov/resource/sn92070146/1934-09-04/ed-1/'},
+      {title: '3 Filipinos Dead in Gun Battle (1936)', event: 'CWFLU 1936', slide: 16, img: 'https://chroniclingamerica.loc.gov/lccn/sn87093377/1936-12-04/ed-1/seq-1/thumbnail.jpg', desc: 'Bremerton Searchlight, Dec. 4, 1936. Duyungan and Simon murders.', url: 'https://www.loc.gov/resource/sn87093377/1936-12-04/ed-1/'},
+      {title: 'Asparagus Cutters Walk Off of Jobs (1939)', event: 'FALA 1939', slide: 17, img: 'https://chroniclingamerica.loc.gov/lccn/sn92070146/1939-04-07/ed-1/seq-1/thumbnail.jpg', desc: 'San Francisco Examiner, April 7, 1939.', url: 'https://www.loc.gov/resource/sn92070146/1939-04-07/ed-1/'},
+      {title: 'War-Time Demand of Japanese Labor (1942)', event: 'WRA Incarceration 1942', slide: 19, img: 'https://chroniclingamerica.loc.gov/lccn/sn86075271/1942-04-09/ed-1/seq-1/thumbnail.jpg', desc: 'Ogden Standard-Examiner, April 9, 1942.', url: 'https://www.loc.gov/resource/sn86075271/1942-04-09/ed-1/'},
+      {title: 'Quotas Upheld and Barring of Filipino Labor Demanded (1933)', event: 'Context: New Deal Exclusion', slide: 18, img: 'https://chroniclingamerica.loc.gov/lccn/sn83045012/1933-12-08/ed-1/seq-1/thumbnail.jpg', desc: 'Washington Post, Dec. 8, 1933. AFL demands Filipino exclusion.', url: 'https://www.loc.gov/resource/sn83045012/1933-12-08/ed-1/'},
+      {title: 'ILWU Local 37 Election Results (1955)', event: 'Local 37 1946–55', slide: 22, img: 'https://chroniclingamerica.loc.gov/lccn/sn88085780/1955-10-14/ed-1/seq-1/thumbnail.jpg', desc: 'Seattle Star, Oct. 14, 1955. Larry Itliong elected.', url: 'https://www.loc.gov/resource/sn88085780/1955-10-14/ed-1/'}
+    ]
+  },
+  loc_photos: {
+    label: 'LOC Prints & Photographs — FSA/OWI Collection',
+    items: [
+      {title: 'Chinese workers, Echo Canyon, Utah (ca. 1869)', event: '1867 Railroad Strike', slide: 1, img: 'https://upload.wikimedia.org/wikipedia/commons/c/c4/Laying_track_in_Echo_Canyon_Utah.jpg', desc: 'Central Pacific Railroad construction. Public domain via Wikimedia Commons.', url: 'https://web.stanford.edu/group/chineserailroad/cgi-bin/website/category/photographs/'},
+      {title: 'Manzanar Children (1942)', event: 'WRA Incarceration 1942', slide: 19, img: 'https://upload.wikimedia.org/wikipedia/commons/8/82/Manzanar_Children.jpg', desc: 'Ansel Adams / LOC. Children at Manzanar concentration camp. Public domain.', url: 'https://www.loc.gov/item/2002695858/'}
+    ]
+  },
+  legal_records: {
+    label: 'Legal Records — Case Files and Court Documents',
+    items: [
+      {title: 'Yick Wo v. Hopkins, 118 U.S. 356 (1886)', event: 'Yick Wo 1886', slide: 2, img: null, desc: 'Full Supreme Court opinion. First equal protection ruling for non-citizens.', url: 'https://supreme.justia.com/cases/federal/us/118/356/'},
+      {title: 'Ozawa v. United States, 260 U.S. 178 (1922)', event: 'Ozawa 1922', slide: 8, img: null, desc: 'Full Supreme Court opinion. Japanese Americans ruled ineligible for naturalization.', url: 'https://supreme.justia.com/cases/federal/us/260/178/'},
+      {title: 'United States v. Thind, 261 U.S. 204 (1923)', event: 'Thind 1923', slide: 9, img: null, desc: 'Full Supreme Court opinion. South Asians ruled ineligible despite being Caucasian.', url: 'https://supreme.justia.com/cases/federal/us/261/204/'},
+      {title: 'Petition for Writ of Error Coram Nobis (1983)', event: 'Korematsu 1983', slide: 27, img: null, desc: 'Densho DDR (ddr-densho-405-1). Original petition to reopen Korematsu case. Free of copyright restrictions.', url: 'https://ddr.densho.org/ddr-densho-405-1/'},
+      {title: 'Motion to Vacate Conviction (1983)', event: 'Korematsu 1983', slide: 27, img: null, desc: 'National Archives San Francisco. November 16, 1983.', url: 'https://www.archives.gov/san-francisco/highlights/korematsu'},
+      {title: 'Luce-Celler Act, Pub. L. 79-483 (1946)', event: 'Luce-Celler Act 1946', slide: 20, img: null, desc: 'Full legislative text. Restored naturalization rights to Filipinos and South Asians.', url: 'https://immigrationhistory.org/item/luce-celler-act/'}
+    ]
+  },
+  external_archives: {
+    label: 'External Archives — Oral Histories and Digital Collections',
+    items: [
+      {title: 'Densho Digital Repository: Coram Nobis Litigation Collection', event: 'Korematsu 1983', slide: 27, img: null, desc: 'Legal briefs, memos, government documents. Free of known copyright restrictions.', url: 'https://ddr.densho.org/ddr-densho-405/'},
+      {title: 'Densho Digital Repository: Japanese American Oral Histories', event: 'WRA Incarceration 1942', slide: 19, img: null, desc: 'Video oral histories; search plantation labor, WRA farm labor, sugar beet.', url: 'https://ddr.densho.org'},
+      {title: 'UW Civil Rights: Cannery Workers Video Oral Histories', event: 'Seattle 1929, CWFLU 1936, Local 37', slide: 16, img: null, desc: 'Streaming video interviews: Dorothy Cordova, Cindy Domingo, David Della, and others.', url: 'https://depts.washington.edu/civilr/cannery_interviews.htm'},
+      {title: 'Welga Digital Archive: Filipino Farmworker History', event: 'Multiple slides', slide: 28, img: null, desc: 'UC Davis Bulosan Center. Timeline, oral histories, Delano grape strike materials.', url: 'https://welgadigitalarchive.omeka.net/fafh'},
+      {title: 'UCSC: Watsonville is in the Heart', event: 'Watsonville Riots 1930', slide: 14, img: null, desc: 'Interactive historical map and oral history archive for the 1930 anti-Filipino riots.', url: 'https://wiith-map.ucsc.edu/historicalmap/'},
+      {title: 'UW: 1952 Local 37 Yearbook (PDF)', event: 'Local 37 1946–55', slide: 22, img: null, desc: 'Edited by Carlos Bulosan. Digitized by FAHNS.', url: 'https://depts.washington.edu/civilr3/pdf/local37yearbook-op.pdf'},
+      {title: 'HathiTrust: America Is in the Heart (Bulosan, 1946)', event: 'Bulosan / America Is in the Heart', slide: 24, img: null, desc: 'Full digital text. Public domain.', url: 'https://babel.hathitrust.org/cgi/pt?id=mdp.39015000566789&seq=1'},
+      {title: 'California Revealed: Larry Itliong Interview (1970)', event: 'Delano 1965', slide: 28, img: null, desc: 'Audio recording. Source for confirmed Itliong quote. Rights owned by Mignon Geli.', url: 'https://californiarevealed.org/do/2f9d49a2-76ab-4d41-ae83-6e321ae05a55'}
+    ]
+  }
+};
+
+function buildSrcDrawer() {
+  var html = '';
+  Object.keys(SOURCES).forEach(function(key) {
+    var sec = SOURCES[key];
+    html += '<div class="src-section">';
+    html += '<div class="src-section-label">' + sec.label + '</div>';
+    sec.items.forEach(function(item) {
+      html += '<div class="src-card" onclick="jump(' + item.slide + ');closeSrcDrawer()">';
+      html += '<div class="src-card-event">→ Slide ' + (item.slide+1) + ': ' + item.event + '</div>';
+      html += '<div class="src-card-title">' + item.title + '</div>';
+      if (item.img) {
+        html += '<img class="src-card-img" src="' + item.img + '" alt="' + item.title + '">';
+      }
+      html += '<div class="src-card-desc">' + item.desc + '</div>';
+      html += '<a class="src-card-link" href="' + item.url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">View source ↗</a>';
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  document.getElementById('src-content').innerHTML = html;
+}
+
+function openSrcDrawer() {
+  buildSrcDrawer();
+  document.getElementById('src-drawer').classList.add('open');
+  document.getElementById('src-overlay').classList.add('open');
+}
+function closeSrcDrawer() {
+  document.getElementById('src-drawer').classList.remove('open');
+  document.getElementById('src-overlay').classList.remove('open');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') { closeSrcDrawer(); closeVidBtn(); }
+});
+
+
+// ─── BOOT ─────────────────────────────────────────────────────────────────────
+try {
+  initMap();
+} catch(err) {
+  console.warn("Map unavailable:", err);
+  document.getElementById("map-msg").style.display = "flex";
+}
+render(0);
+</script>
+</body>
+</html>
