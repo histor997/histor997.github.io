@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jinrui Zhang</title>
+<meta name="description" content="Jinrui Zhang. Research, public engagement, and prototypes on why institutions fail and how to build ones that do. Beijing, 2026.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Jinrui Zhang">
+<meta property="og:description" content="Jinrui Zhang. Research, public engagement, and prototypes on why institutions fail and how to build ones that do. Beijing, 2026.">
+<meta name="theme-color" content="#f6f6f1">
+<!-- Keeps search engines from listing this page. Delete the next line after the application if you want to be found by search. -->
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%231f4e79'/%3E%3Ctext x='32' y='45' font-size='34' text-anchor='middle' fill='%23f6f6f1' font-family='Georgia,serif'%3EJZ%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="page">
+
+  <header class="title-page">
+    <h1 class="name">Jinrui Zhang</h1>
+    <hr class="double-rule">
+    <p class="subtitle">Observations, associations, and the quest for a new press</p>
+    <blockquote>
+      <p>It has been frequently remarked that it seems to have been reserved to the people of this country, by their conduct and example, to decide the important question, whether societies of men are really capable or not of establishing good government from reflection and choice, or whether they are forever destined to depend for their political constitutions on accident and force.</p>
+      <cite>Alexander Hamilton, <em>The Federalist</em> No. 1 (1787)</cite>
+    </blockquote>
+    <hr class="double-rule">
+    <p class="imprint">Beijing · 2026</p>
+  </header>
+
+  <nav class="contents" aria-label="Contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><span>Preface</span><a href="#preface">Reflection and Choice</a></li>
+      <li><span>Part I</span><a href="#press">Toward a New Press</a></li>
+      <li><span>Part II</span><a href="#observations">Observations</a></li>
+      <li><span>Part III</span><a href="#associations">Associations</a></li>
+      <li><span>Next</span><a href="#next">alētheia</a></li>
+      <li><span>Bookshelf</span><a href="bookshelf.html">Reading</a></li>
+      <li><span>Colophon</span><a href="#colophon">Links and record</a></li>
+    </ol>
+  </nav>
+
+  <!-- PREFACE -->
+  <section class="part" id="preface">
+    <div class="part-opener">
+      <p class="part-num">Preface</p>
+      <h2>Reflection and Choice</h2>
+    </div>
+    <div style="max-width: var(--measure); margin: 0 auto;">
+      <p>I first knew America as a cowboy. Frontier, Kansas, independence, a man on a horse against an empty horizon. No matter how stereotypical, it caught something real, even if I couldn't name it yet.</p>
+      <p>In the summer of 2025, in Stanford's library, I found James Madison's signature in a copy of <em>Paradise Lost</em> that Thomas Jefferson had also signed. I was there to read about the early republic history of American Enlightenment. Yet I was lost in its future. Milton was asking what human beings do with freedom. A century later, Hamilton would ask whether a people could establish its government through "reflection and choice," rather than accident and force.</p>
+      <p>The cowboy was only a myth, beyond those who actually toiled at the Frontier. Behind it was an almost classical thesis: whether human agency could bend the future, or whether we are forever carried by forces we didn't choose.</p>
+      <p>I have spent much of my life waiting for things I could not control. It didn't teach me to predict the future. It taught me to prepare for it, and, when the moment came, to choose. This portfolio is a record of those choices: the things I observed, the people I joined, and the new press I am still looking for.</p>
+    </div>
+  </section>
+
+  <!-- PART I: PRESS -->
+  <section class="part" id="press">
+    <div class="part-opener">
+      <p class="part-num">Part I</p>
+      <h2>Toward a New Press</h2>
+    </div>
+
+    <article class="project" id="tesla-map">
+      <header>
+        <h3>Tesla in China: An Interactive Map</h3>
+        <p class="meta">Completed · <a href="tesla-map.html">Live demo</a></p>
+      </header>
+      <div class="main">
+        <p>The paper's thesis is invisible in a table. Contrary to the conventional wisdom of Chinese policies' top-down effects, supply-chain integration determines Tesla's provincial market share. With Claude's help, I built a choropleth map with a toggle: BEV (battery electric vehicle) or NEV (new energy vehicle) denominator. Under BEV, Xinjiang looks like Tesla's strongest market. Switch to NEV and it falls back, while the Yangtze Delta comes into focus. The gap comes from how many plug-in hybrids each province registers, which changes the denominator. The toggle makes that visible.</p>
+      </div>
+      <aside class="margin">
+        <p>The drawing was the easy part. The boundary file names provinces in Chinese and the registration data uses two-letter codes, so the 30 provinces had to be matched one by one, and a wrong match would quietly shade the wrong place.</p>
+        <p>A toggle is an argument. The BEV/NEV switch doesn't just display two datasets. It forces the viewer to ask why they differ. That question is the paper's thesis in one click.</p>
+      </aside>
+    </article>
+
+    <article class="project" id="lhrp">
+      <header>
+        <h3>One Step Forward, Two Steps Back</h3>
+        <p class="meta">Completed · Georgetown Labor History Resource Project · <a href="https://lhrp.georgetown.edu/featured/one-step-forward-two-steps-back.html">Live on Georgetown's site</a> · <a href="lhrp-storymap.html">Source</a></p>
+      </header>
+      <div class="main">
+        <p>I cold-emailed Patrick Dixon at Georgetown, LHRP's director, with a pitch deck. No institutional affiliation, no faculty sponsor. The bet was that while the website fascinates me with its detailed documentation of labor unrest, the gap in their archive, without meaningful exposure to Asian migrant labor organizations on the West Coast, was important enough that they'd let a high school student fill it.</p>
+        <p>They did. I spent months in the Library of Congress recovering thirty forgotten strikes and unionization drives from contemporary newspapers and union yearbooks, then built an interactive StoryMap tracing the Pacific labor corridor from Hawai&#699;i through California to the Pacific Northwest. It is now live on Georgetown's site.</p>
+      </div>
+      <aside class="margin">
+        <p>Meetings with the director and volunteers were almost weekly. Meetings with a Stanford designer whose Pacific railroad StoryMap became my template happened at whatever hour we could find. Once at five in the morning Beijing time, because she had just finished work in New York.</p>
+      </aside>
+    </article>
+
+    <article class="project" id="nlp">
+      <header>
+        <h3>Jesuit Corpus Explorer</h3>
+        <p class="meta"><a href="nlp-pipeline.html">Live prototype</a> · Part of Mapping Classical Reception in Beijing</p>
+      </header>
+      <div class="main">
+        <p>When a Jesuit missionary describes himself in a private Latin petition to his General, and later in a letter edited and published for French readers, does the self he presents change? To work toward an answer I built a pipeline that scores Jesuit writing on seven dimensions of self-description: spiritual interiority, bodily vulnerability, mission desire, obedience, cultural encounter, scientific self, and eschatological time. The explorer shows 18 published letters from the <em>Lettres &eacute;difiantes</em>, normalized per 1,000 words so that long and short letters can be compared. What it shows today is how much published letters differ from one another. That spread is the baseline. A gap between private and published writing only means something if it is larger than the gap between two published letters.</p>
+      </div>
+      <aside class="margin">
+        <p>The private side of the comparison is not here yet. It needs Indipetae by the same authors, held in the Jesuit archives in Rome. I would rather show an empty slot than a misleading gap.</p>
+        <p>For a museum-kiosk version I wrote a product spec first. One rule came before any interface work: any passage the model cites must appear word for word in the source, or it is dropped. A fabricated quotation next to real Latin is the one mistake a classicist catches at once.</p>
+      </aside>
+    </article>
+
+    <article class="project" id="podcast">
+      <header>
+        <h3>&#22312;&#22330; Present</h3>
+        <p class="meta">Ongoing · Podcast · <a href="https://open.spotify.com/episode/6U6KimrhKk2XLNrRVssqsQ">Episode 1 on Spotify</a> · <a href="https://www.xiaoyuzhoufm.com/episode/6a9be85ff03e74ee6b057d5e">Episode 2 on &#23567;&#23431;&#23449;</a></p>
+      </header>
+      <div class="main">
+        <p>Started with a conversation that my chemistry teacher said shouldn't just stay in the room. The first episode brought together my English teacher, a writer who has lived across Eastern Europe, China, and America, and a Columbia-trained political economy PhD. We talked about crossing as privilege and crossing as necessity, the Republic of Letters as the world's first internet, why your second language is where you fight better.</p>
+        <p>The second, with Prof. Erika Valdivieso from Yale Classics, traces Virgil's reception in Latin America and what public humanities might become when it stops being a Western monologue. A third conversation, with Julian Posada from Yale American Studies on shared labor rights violations in China's and Latin America's data annotation industries, is recorded and not yet released. I also plan to invite Alice Kessler-Harris, a historian of American labor at Columbia whom I know through the Labor History Resource Project with Dr. Dixon's support, for a future episode.</p>
+      </div>
+      <aside class="margin">
+        <p>Recording is the opposite of writing. A paper hides behind its footnotes. A conversation exposes you in real time. Two episodes are out and a third is recorded. No studio, no editor, no institution. Just a microphone and a question worth asking out loud.</p>
+      </aside>
+    </article>
+      <p class="note" style="margin-top:2rem">In progress: alētheia, a record for stories being compressed and later retold. See <a href="#next">Next</a>.</p>
+  </section>
+
+  <!-- PART II: OBSERVATIONS -->
+  <section class="part" id="observations">
+    <div class="part-opener">
+      <p class="part-num">Part II</p>
+      <h2>Observations</h2>
+    </div>
+
+    <article class="project" id="guilds">
+      <header>
+        <h3>Between Ritual and Craft: Guild Corporatism in Late Imperial China</h3>
+        <p class="meta">75th Midwest Conference on Asian Affairs · 2026 Southwest Conference on Asian Studies · Accepted</p>
+      </header>
+      <div class="main">
+        <p>This paper asks a question that can be traced back to the <em>Great Divergence</em>: why did the most organized urban communities in late imperial China produce nothing comparable to a modern civil society? The guilds had literate leadership, collective welfare, and the capacity to govern urban life. By every comparative metric, especially the Western European ones, they should have generated civil society. They didn't. Not simply because of despotism, not because of commercial stagnation. Because their own ritual hierarchies, patron-deity worship, apprenticeship ceremony, native-place obligation, reproduced imperial authority from the inside. The more institutionally sophisticated they became, the more perfectly they replicated the structure they might have challenged.</p>
+      </div>
+      <aside class="margin">
+        <p>The hardest move was arguing against both sides. Weber says Chinese despotism crushed civic life. William Rowe and Rankin say civic life flourished. I'm saying neither. The constraint was internal, and neither camp had recognized it.</p>
+        <p>Organization does not equal power. This sentence has shaped everything I've done since.</p>
+      </aside>
+    </article>
+
+    <article class="project" id="jesuits">
+      <header>
+        <h3>Floating Antiquities, Contested Heavens: Jesuit Cosmology and State Authority</h3>
+        <p class="meta">2026 Janus Conference · Accepted</p>
+      </header>
+      <div class="main">
+        <p>The 1665 Calendar Case is usually told as science versus tradition. I read it as a collision between two equally constructed antiquities, one Confucian, one Aristotelian, each claiming a classical past neither actually possessed. Yang Guangxian's indictment borrows its moral authority from Mencius. A sage-level posture adopted by a minor official, recognizably presumptuous to contemporary readers. When Verbiest prevailed, he did not win with the Aristotelian cosmology Yang had attacked. He won with Tychonic astronomy, which had already dropped Aristotle's solid celestial spheres and drawn on Stoic ideas instead. Neither antiquity survived the contest intact. The winner had departed from the authority invoked in its name.</p>
+      </div>
+      <aside class="margin">
+        <p>The case repays attention not as a China-West story but as a study in how institutional actors perform certainty while working around constraints they cannot admit out loud. A dynamic that did not end in 1742.</p>
+        <p>The question I carry from it: how do Chinese and Western science work with and against each other now, and how do the incentives of states, funders, and journals bend what gets built?</p>
+      </aside>
+    </article>
+
+    <article class="project" id="shaanxi">
+      <header>
+        <h3>Land Transfer and Rural Governance in Baoji, Shaanxi</h3>
+        <p class="meta">Independent fieldwork</p>
+      </header>
+      <div class="main">
+        <p>I went home. After reading Mattingly's <em>The Art of Political Control in China</em>, I designed independent fieldwork in my family's home region. North and South Wushao villages in Baoji, the rust-belt city where my uncle's Volkswagen navigates emptying streets. I interviewed village cadres, cooperative managers, and farmers. They knew my family. I had no institutional authority, but they had no reason to perform for me either. What I found was not the static bureaucracy I'd expected. Villagers quoted anti-corruption slogans they'd seen on village walls to win land disputes, turning the regime's language against its own agents.</p>
+      </div>
+      <aside class="margin">
+        <p>Theory looks different from the ground. Scott and O'Brien are precise categories, until you watch a farmer deploy them without having read either.</p>
+      </aside>
+    </article>
+
+    <article class="project" id="annotation">
+      <header>
+        <h3>Inside China's Data Annotation Chain</h3>
+        <p class="meta">Fieldwork · <a href="https://data-workers.org/">Data Workers' Inquiry</a></p>
+      </header>
+      <div class="main">
+        <p>I took a part-time job as a data annotator through a WeChat group. Text classification and translation files arrived as attachments, pay came as personal transfers, there was no contract and no terms of service, and the recruiter who sent my first file told me, unprompted, that he too was merely a contractor. I wanted to know what comes after noticing that, so I cold-emailed Dr. Milagros Miceli of the Data Workers' Inquiry and met online. She walked me through how Kenyan annotators had converted informal organizing into unionization, and unionization into the foundation for legislative advocacy. The model was clear: collective bargaining first, legal infrastructure second, governance framework third. In China, step one is structurally blocked. The dispersion that makes gig work feel like freedom is precisely what prevents the organizing that everything else depends on. I left with a map of what's missing, not just a description of what's broken. A recorded but not yet released podcast conversation with Julian Posada extends this question into Latin America.</p>
+      </div>
+      <aside class="margin">
+        <p>I identified a vulnerability no governance framework I'd encountered had named: because English annotation disproportionately attracts academically proficient students, the informal WeChat recruitment channel is a de facto pipeline into data labor for minors. No age verification, no filtering, no visibility in international AI frameworks.</p>
+      </aside>
+    </article>
+  </section>
+
+  <!-- PART III: ASSOCIATIONS -->
+  <section class="part" id="associations">
+    <div class="part-opener">
+      <p class="part-num">Part III</p>
+      <h2>Associations</h2>
+    </div>
+
+    <article class="project" id="frank">
+      <header>
+        <h3>Frank</h3>
+        <p class="meta">Ongoing · Peer mentorship</p>
+      </header>
+      <div class="main">
+        <p>I was assigned to tutor a sophomore named Frank Zhang in AP English. A student from outside Beijing, navigating migration and the absence of sustained mentorship.</p>
+        <p>I started a reading group partly to prove something: that through Socratic questioning, students like Frank could be cultivated into political awareness. During our meetings, Frank would listen while others debated current affairs and remain silent. I kept throwing out questions, waiting for the response that would show my method was working.</p>
+        <p>Our real conversations only began after I stopped asking. Riding the bus home with milk tea, we discovered a shared love of jazz. From Miles Davis and improvisation, the talk wandered toward Frank's childhood in &Uuml;r&uuml;mqi. The lamb chops, the drinking culture, the parts of his family history he never mentioned. Growing up with his grandfather, a senior commander in Xinjiang Bingtuan, he remembered dinner-table references he didn't understand as a child. Only later did he realize what those fragments belonged to.</p>
+        <p>I had thought his silence was something to overcome. He didn't avoid politics because he had never thought about it. He had thought about it enough to know how painful choosing a side could be.</p>
+        <p>He signed up for the Chinese Young Physicists' Tournament. I asked how his physics was. "Average." "Then why are you signing up?" He thought for a moment. "Sounds interesting." So I helped. Reading fluid dynamics papers, watching COMSOL guides late into the evening. He earned a place on the varsity team, became its student leader, now mentors younger participants himself. While preparing for CYPT, he taught me physics I would never have explored alone.</p>
+        <p>Last month we visited the Beijing Ancient Observatory. Standing in front of the armillary sphere, Western astronomy brought by Jesuit missionaries, integrated with Jieqi, the Chinese tradition of celestial observation.</p>
+        <p>"I wish today's NSF and Chinese Academy of Sciences could do the same," I joked.</p>
+        <p>We all smiled.</p>
+      </div>
+      <aside class="margin">
+        <p>We have no good name for this, so we borrow the nearest one. In private, we call it friendship. In public, if we are lucky, we call it democracy.</p>
+        <p class="note">Contact: <a href="mailto:zhangzh.frank@gmail.com">zhangzh.frank@gmail.com</a></p>
+      </aside>
+    </article>
+
+    <article class="project" id="bb">
+      <header>
+        <h3>Building Bridges: From Teaching to Trust</h3>
+        <p class="meta">Teaching assistant, Dunhuang 2026 · Product Manager for Building Bridges · PRD Draft, in progress · <a href="bb-portal.html">Requirements at a glance</a></p>
+      </header>
+      <div class="main">
+        <p>I went to Dunhuang this summer as one of twelve teaching assistants for Building Bridges, a volunteer program started by Yale students in 2008. I taught a three-day course on platform capitalism, and hosted BB Spaces to enable after-class community building for 100+ students and volunteers. What stayed with me was not the classroom. It was what a school, a family, or a local office has to be able to believe before it lets a volunteer program in. It felt like fieldwork, and the subject was trust.</p>
+        <p>After the program ended I reached out to its leaders about building a new website and a toolkit for exactly that, and joined the Building Bridges reform working group. I wrote the PRD for the first phase. Essentially, a principal who receives our invitation has five minutes and one problem: he has to view the program as sound, and then he has to explain it to government officials for approval. So the first version is a trust tool. Seven pages, Chinese first, built for a phone opened in WeChat, and as a second priority a short pack he can forward. Every number carries a source, and a partner appears only after it has confirmed the wording.</p>
+      </div>
+      <aside class="margin">
+        <p>The test in the draft is not whether he understands us. It is whether he can say who we are, in three sentences, to his superior, and get it right. I have not run it yet.</p>
+        <p>What I can't design away is what happens after he closes the page. The superior hears three sentences, not seven pages. That retelling is where a story loses its conditions, and nobody who could correct it is in the room.</p>
+      </aside>
+    </article>
+
+    <article class="project" id="scs">
+      <header>
+        <h3>Ancient Worlds, Modern Communities</h3>
+        <p class="meta">Completed · Society for Classical Studies mini-grant · <a href="https://classicalstudies.org/scs-blog/jinrui-zhang/blog-reimagining-classical-antiquity-modern-china">SCS blog</a></p>
+      </header>
+      <div class="main">
+        <p>First team in mainland China to receive the SCS's <em>Ancient Worlds, Modern Communities</em> mini-grant. Three in-person seminars, two in Beijing backed by the Stanford Center at Peking University, one in Ningbo. An online panel with Edith Hall from Durham. The second Beijing session, co-hosted with the Asian Liver Center, placed Roman public bathing in dialogue with contemporary hepatitis B discrimination in Chinese employment law. Some participants signed up to volunteer with ALC afterward. I wrote an opinion piece on the SCS website. <em>Pasts Imperfect</em>, a scholarly newsletter on global antiquity, picked it up.</p>
+      </div>
+      <aside class="margin">
+        <p>The real metric was beyond attendance: it was the moment when a participant who came for Cicero left with an ALC volunteer form.</p>
+      </aside>
+    </article>
+
+    <article class="project" id="civic">
+      <header>
+        <h3>Cross-City Civic Education Initiative</h3>
+        <p class="meta">Completed · Ningbo, Nanjing, Shanghai</p>
+      </header>
+      <div class="main">
+        <p>I co-founded a civic education group with eight student organizers from Ningbo, Nanjing, and Shanghai. We met every week, outside our schools, to talk about citizenship and collective action with students from different backgrounds. Over time we ran school discussions, reading groups, and public seminars that reached about 120 people, on migrant labor, disability rights, hepatitis B and HIV discrimination, and criminal justice reform. We read Rawls and Sandel and studied youth-led movements such as March for Our Lives. We also held a two-day reading seminar for about 30 student activists, with speakers from NGOs, including the Asian Liver Center and Heile Social Enterprise, and a college freshman who is building a prisoner reentry program through entrepreneurship.</p>
+      </div>
+      <aside class="margin">
+        <p>The organizational model was the thesis: horizontal, voluntary, deliberately unformalized. Every successful organization faces the pressure to calcify. Whether keeping it loose was wisdom or just youth, I'm still deciding.</p>
+      </aside>
+    </article>
+
+    <article class="project" id="lar">
+      <header>
+        <h3>Liberal Arts Review</h3>
+        <p class="meta">Ongoing · Chair &amp; editor-in-chief · Beijing 101 High School</p>
+      </header>
+      <div class="main">
+        <p>I took a student journal and turned it into an institution. Launched the Insight Commons Fellowship with Princeton and Johns Hopkins tutors, 15 students working toward their first independent papers through Braudel, Scott, <em>Shanghai on Strike</em>. The most consequential move: merging 6 humanities clubs across 101's international and national departments. Two club leaders were skeptical. The negotiation, shared governance, resource-pooling, cross-department events, taught me more about institutional design than any paper I've written.</p>
+      </div>
+      <aside class="margin">
+        <p>A journal is an institution. Treating it as one, with governance, partnerships, distribution, was my first experiment in building something that outlasts the founder.</p>
+      </aside>
+    </article>
+  </section>
+
+  <!-- NEXT -->
+  <section class="part" id="next">
+    <div class="part-opener">
+      <p class="part-num">Next</p>
+      <h2>alētheia</h2>
+    </div>
+
+    <article class="project" id="alethia">
+      <header>
+        <h3>A record for stories that get retold</h3>
+        <p class="meta">In progress · Proposed Academy project</p>
+      </header>
+      <div class="main">
+        <p>Every time a story is retold, it is compressed again by someone who can't check it. In the Building Bridges draft it happens in three sentences to a superior. In a company it happens between an engineer's test report and a press release. I want to build a record kept at the time of writing: each public claim stored with its status (measured, estimated, hypothesis), its conditions, its source, and its known disagreement. Shorter versions are generated from the record, and each carries a list of what it left out and a path back to the longer one. The rule is that compression must be recoverable.</p>
+        <p>My essay was about the structure that lets scattered people act as one. Trust is the part I can build first. A small program, a school, or a company can only act when others believe what it says, and belief needs a path back to evidence. It is also the thread through my reading: Strauss on what writers hide, my guild paper on what organization costs, and the Jesuit letters on the question of what editing changes.</p>
+        <p>The first user is a hypothesis. In regulated industries, how a company talks about itself is already reviewed as part of compliance, so I expect the first user to be the review function rather than the founder who wants a better story. I have not yet spoken to anyone who does this work. I would start by hand: small, time-boxed, public documents only, and every engagement must leave something reusable, such as the claim structure, the loss categories, and a test set. If I am still customizing after the third document, it is a service, and I should say so.</p>
+        <p>So far: my guild paper has been broken into 30 claims, three shorter versions, and a first set of labels drafted by Claude. Next I review every label and run an audit with a separate model instance. Results: pending. Building Bridges is deployment zero.</p>
+        <p>The Academy's teaching maps onto the weak points of this project. I would take the course on building and evaluating AI products to test the audit properly, which is the weakest part of my pilot; the courses on the industrial stack to understand the companies whose claims I would be checking; the media course to see how stories travel once the editor is gone; and the track on institutions to put my guild paper and this project in the same room. Weekly review suits work that can show an artifact every week: a claim record or an audit. The three-month co-op (e.g., at Stripe Press) is the part I cannot test alone: sitting inside an organization whose public claims carry consequences, with partners that include energy, aerospace, and defense companies. Mentors who run podcasts and editorial platforms could tell me whether the record makes stories better to read or only safer to publish.</p>
+        <p>The bar is high. Review work does not accept 90 percent correct. If the audit finds only part of what was dropped, the honest product flags cases for a person and points to the source.</p>
+      </div>
+      <aside class="margin">
+        <p>What I do not know: whether the loss categories hold outside a history paper, whether anyone will want their qualifiers exposed, and whether the work gets faster each time.</p>
+        <p>If admitted, the plan I would hold myself to is building and testing the record on campus with Building Bridges and one outside document set, then using the co-op to see the real thing from the inside.</p>
+      </aside>
+    </article>
+  </section>
+
+  <!-- COLOPHON -->
+  <footer class="colophon" id="colophon">
+    <h2>Colophon</h2>
+    <ul>
+      <li><a href="https://github.com/histor997">GitHub</a></li>
+      <li><a href="https://open.spotify.com/episode/6U6KimrhKk2XLNrRVssqsQ">Podcast: &#22312;&#22330; Present</a></li>
+      <li><a href="https://classicalstudies.org/scs-blog/jinrui-zhang/blog-reimagining-classical-antiquity-modern-china">Reimagining Classical Antiquity in Modern China (SCS)</a></li>
+      <li><a href="https://lhrp.georgetown.edu/featured/one-step-forward-two-steps-back.html">LHRP exhibit (Georgetown)</a></li>
+      <li><a href="bookshelf.html">Bookshelf</a></li>
+      <li><a href="https://substack.com/@zeitgeist938808/note/p-219520157">Substack: Views are Cheap. Show Me Your Conviction</a></li>
+    </ul>
+    <p class="note">Set in Libre Caslon, after William Caslon's type. The Declaration of Independence was first printed in Caslon. Accent in Prussian blue, an 18th-century pigment that traveled from Berlin to Qing dynasty porcelain. Built with HTML, CSS, and Leaflet.js. Hosted on GitHub Pages.</p>
+  </footer>
+
+</div>
+</body>
+</html>
