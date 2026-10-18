@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jesuit Corpus Explorer · Jinrui Zhang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f6f6f1;--ink:#16263a;--prussian:#1f4e79;--muted:#5d6874;--rule:#c9cfd6;--line:#5a7fa8;--fill:#eaeef3}
+@media (prefers-color-scheme:dark){:root{--paper:#12161c;--ink:#dde3ea;--prussian:#8fb4dc;--muted:#9aa5b1;--rule:#2d3640;--line:#6f93bd;--fill:#1c232c}}
+*{box-sizing:border-box;margin:0}
+body{font-family:"Libre Caslon Text",Georgia,"Noto Serif SC",serif;background:var(--paper);color:var(--ink);line-height:1.65;font-size:1.05rem}
+.page{max-width:900px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+a{color:var(--prussian)}
+h1{font-size:1.7rem;margin-bottom:.3rem}
+h2{font-size:1.15rem;margin:2.8rem 0 .6rem;padding-bottom:.4rem;border-bottom:1px solid var(--rule)}
+.sub{color:var(--muted);font-style:italic;margin-bottom:1.5rem}
+.note{font-size:.88rem;color:var(--muted);line-height:1.55;margin:.5rem 0}
+.status{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;border-left:2px solid var(--prussian);padding:.2rem 0 .2rem 1.2rem;margin:1.2rem 0 .5rem;font-size:.92rem}
+.status h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.07em;color:var(--prussian);margin-bottom:.3rem}
+.status p+p{margin-top:.4rem}
+@media(max-width:640px){.status{grid-template-columns:1fr}}
+.controls{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;margin:1rem 0;font-size:.9rem}
+select{font:inherit;font-size:.9rem;padding:.3rem .5rem;border:1px solid var(--prussian);background:transparent;color:var(--ink);max-width:100%}
+#pc-wrap svg,#radar-wrap svg{width:100%;height:auto;display:block}
+.info{border:1px solid var(--rule);background:var(--fill);padding:.8rem 1rem;font-size:.88rem;min-height:4.5rem;margin-top:.6rem}
+.info strong{color:var(--prussian)}
+table{border-collapse:collapse;width:100%;font-size:.82rem;margin-top:.5rem}
+th,td{text-align:left;padding:.25rem .45rem;border-bottom:1px solid var(--rule)}
+th{color:var(--prussian)}
+.two{display:grid;grid-template-columns:minmax(0,340px) 1fr;gap:2rem;align-items:start}
+@media(max-width:700px){.two{grid-template-columns:1fr}}
+.swatch{display:inline-block;width:18px;height:0;border-top:3px solid;vertical-align:middle;margin-right:.4rem}
+ol.steps{margin:.6rem 0 0 1.2rem;font-size:.95rem}
+ol.steps li{margin-bottom:.4rem}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Jesuit Corpus Explorer</h1>
+  <p class="sub">Part of Mapping Classical Reception in Beijing. A prototype for asking how Jesuit missionaries describe themselves in private petitions and in letters edited for publication.</p>
+
+  <div class="status">
+    <div>
+      <h3>What this page shows</h3>
+      <p>18 scored records from the <em>Lettres &eacute;difiantes</em> (volumes 9 to 13), rated on seven dimensions of self-description. Scores are shown per 1,000 words, so long and short letters can be compared.</p>
+      <p>The spread between published letters, which is the baseline any genre difference has to beat.</p>
+    </div>
+    <div>
+      <h3>What it does not show yet</h3>
+      <p>The private side. The comparison needs Latin <em>Indipetae</em> written by the same authors, which are held in the Jesuit archives in Rome and are not yet in my hands.</p>
+      <p>So there is no genre gap on this page, and nothing here should be read as one.</p>
+    </div>
+  </div>
+
+  <h2>1. The published corpus, record by record</h2>
+  <p class="note">Each line is one record. Each axis runs from zero to the highest value in this corpus on that axis, so shapes show relative position. Hover a line, or choose one from the list. Exact values appear below. Because every axis is scaled to its own maximum, the Science axis, whose maximum is only 0.15 per 1,000 words, makes a handful of word hits look dramatic. Read the values, not only the shape.</p>
+  <div class="controls">
+    <label for="pick">Highlight a record:</label>
+    <select id="pick"></select>
+  </div>
+  <div id="pc-wrap"><svg id="pc" viewBox="0 0 880 330" role="img" aria-label="Parallel coordinates of 18 Lettres edifiantes records across seven dimensions"></svg></div>
+  <div class="info" id="info">Choose a record to see its values.</div>
+
+  <h2>2. One record against the corpus median</h2>
+  <p class="note">Same seven axes, same scaling. The legend reserves a slot for an Indipeta profile, to be drawn once the private texts exist.</p>
+  <div class="two">
+    <div id="radar-wrap"><svg id="radar" viewBox="0 0 340 320" role="img" aria-label="Radar of one record against the corpus median"></svg></div>
+    <div>
+      <p style="font-size:.9rem;margin-bottom:.4rem"><span class="swatch" style="border-color:var(--prussian)"></span><span id="leg-sel">Selected record</span></p>
+      <p style="font-size:.9rem;margin-bottom:.4rem"><span class="swatch" style="border-color:var(--muted)"></span>Corpus median</p>
+      <p style="font-size:.9rem;margin-bottom:.8rem"><span class="swatch" style="border-color:var(--muted);border-top-style:dashed"></span>Indipeta profile: awaiting archival access</p>
+      <table id="tbl"></table>
+    </div>
+  </div>
+
+  <h2>3. The comparison this is built for</h2>
+  <p style="font-size:.95rem">The question is whether one author's private petition and his published letters differ by more than published letters differ from each other. The design has three steps.</p>
+  <ol class="steps">
+    <li>Pair each author with his own Indipeta. The comparison has to be same-author, same-era. Ricci, who died in 1610, never appears in the <em>Lettres</em>, which began in 1702. His published counterpart would be Trigault's 1615 edition of his journals, a different kind of text.</li>
+    <li>Score both texts the same way and divide by length. A short petition and a long letter are only comparable per 1,000 words, and a very short sample is unstable in either direction.</li>
+    <li>Compare the gap to the spread in section 1. If the genre gap is no larger than the difference between two published letters, it is not evidence of editing.</li>
+  </ol>
+
+  <h2>4. Notes on method</h2>
+  <p class="note">Scores come from the research pipeline behind this project, which combines dictionary matching, embedding similarity, and LLM annotation across seven dimensions. This page displays results and does not run the pipeline.</p>
+  <p class="note">In the product spec for a museum-kiosk version, one rule was fixed before any interface work: any passage the model cites must appear word for word in the source text, or it is dropped before display. A fabricated quotation next to real Latin is the one error a specialist would catch at once.</p>
+  <p class="note">Data caveats. Scores are word-list counts and depend on the dictionaries used. The scientific-self axis is almost empty in this corpus (highest value 0.15 per 1,000 words). Two author-volume pairs, Cholenec in volume 12 and Martin in volume 13, appear as two records each with different word counts. I have kept them separate, marked (a) and (b), until I can check whether they overlap.</p>
+
+  <p class="note" style="margin-top:2.5rem"><a href="index.html">&larr; Back to portfolio</a></p>
+</div>
+
+<script>
+var DATA = [{"id": "a1d83321", "label": "vol.9 — BOUCHET", "vol": 9, "order": 1, "words": 30601, "year": null, "raw": {"spiritual_interiority": 40, "bodily_vulnerability": 38, "mission_desire": 33, "institutional_obedience": 16, "cultural_encounter": 29, "scientific_self": 3, "temporal_eschatological": 96}}, {"id": "4801d850", "label": "vol.9 — Seconde lettre — MARTIN", "vol": 9, "order": 2, "words": 13257, "year": null, "raw": {"spiritual_interiority": 28, "bodily_vulnerability": 35, "mission_desire": 13, "institutional_obedience": 12, "cultural_encounter": 3, "scientific_self": 2, "temporal_eschatological": 49}}, {"id": "c9cfe0aa", "label": "vol.9 — de CHAVAGNAC", "vol": 9, "order": 3, "words": 5157, "year": 1705, "raw": {"spiritual_interiority": 9, "bodily_vulnerability": 7, "mission_desire": 17, "institutional_obedience": 3, "cultural_encounter": 12, "scientific_self": 0, "temporal_eschatological": 10}}, {"id": "5d5e2b6a", "label": "vol.9 — de B OURZES", "vol": 9, "order": 4, "words": 2255, "year": null, "raw": {"spiritual_interiority": 1, "bodily_vulnerability": 0, "mission_desire": 1, "institutional_obedience": 0, "cultural_encounter": 0, "scientific_self": 0, "temporal_eschatological": 6}}, {"id": "a0725e00", "label": "vol.9 — JARTOÜX", "vol": 9, "order": 5, "words": 8712, "year": 1703, "raw": {"spiritual_interiority": 8, "bodily_vulnerability": 13, "mission_desire": 12, "institutional_obedience": 23, "cultural_encounter": 7, "scientific_self": 0, "temporal_eschatological": 16}}, {"id": "a02c7478", "label": "vol.11 — BOUCHET", "vol": 11, "order": 1, "words": 13151, "year": null, "raw": {"spiritual_interiority": 23, "bodily_vulnerability": 21, "mission_desire": 10, "institutional_obedience": 9, "cultural_encounter": 0, "scientific_self": 0, "temporal_eschatological": 39}}, {"id": "08f39ec7", "label": "vol.11 — On Reverend Pere", "vol": 11, "order": 2, "words": 20729, "year": 1707, "raw": {"spiritual_interiority": 51, "bodily_vulnerability": 21, "mission_desire": 28, "institutional_obedience": 6, "cultural_encounter": 3, "scientific_self": 2, "temporal_eschatological": 69}}, {"id": "392ff4d3", "label": "vol.11 — JACQUEMINE", "vol": 11, "order": 3, "words": 29460, "year": 1712, "raw": {"spiritual_interiority": 22, "bodily_vulnerability": 83, "mission_desire": 16, "institutional_obedience": 24, "cultural_encounter": 4, "scientific_self": 1, "temporal_eschatological": 134}}, {"id": "19cecd55", "label": "vol.12 — de BOURZES", "vol": 12, "order": 1, "words": 9431, "year": null, "raw": {"spiritual_interiority": 5, "bodily_vulnerability": 9, "mission_desire": 14, "institutional_obedience": 2, "cultural_encounter": 3, "scientific_self": 0, "temporal_eschatological": 30}}, {"id": "2a797836", "label": "vol.12 — CHOLENEC", "vol": 12, "order": 2, "words": 49498, "year": 1715, "raw": {"spiritual_interiority": 80, "bodily_vulnerability": 84, "mission_desire": 37, "institutional_obedience": 17, "cultural_encounter": 24, "scientific_self": 2, "temporal_eschatological": 161}}, {"id": "fb637bab", "label": "vol.12 — CHOLENEC", "vol": 12, "order": 2, "words": 16263, "year": 1715, "raw": {"spiritual_interiority": 50, "bodily_vulnerability": 35, "mission_desire": 9, "institutional_obedience": 6, "cultural_encounter": 0, "scientific_self": 0, "temporal_eschatological": 71}}, {"id": "97cbdd37", "label": "vol.12 — lettre 3", "vol": 12, "order": 3, "words": 19933, "year": null, "raw": {"spiritual_interiority": 13, "bodily_vulnerability": 30, "mission_desire": 20, "institutional_obedience": 3, "cultural_encounter": 6, "scientific_self": 0, "temporal_eschatological": 52}}, {"id": "734d69b0", "label": "vol.12 — On Reverend Pere", "vol": 12, "order": 4, "words": 13302, "year": null, "raw": {"spiritual_interiority": 17, "bodily_vulnerability": 19, "mission_desire": 8, "institutional_obedience": 8, "cultural_encounter": 18, "scientific_self": 2, "temporal_eschatological": 38}}, {"id": "bb953153", "label": "vol.13 — MARTIN", "vol": 13, "order": 1, "words": 43352, "year": 1711, "raw": {"spiritual_interiority": 136, "bodily_vulnerability": 162, "mission_desire": 41, "institutional_obedience": 39, "cultural_encounter": 10, "scientific_self": 3, "temporal_eschatological": 109}}, {"id": "5f772091", "label": "vol.13 — MARTIN", "vol": 13, "order": 1, "words": 13739, "year": 1711, "raw": {"spiritual_interiority": 13, "bodily_vulnerability": 27, "mission_desire": 16, "institutional_obedience": 16, "cultural_encounter": 8, "scientific_self": 0, "temporal_eschatological": 38}}, {"id": "f3137c5b", "label": "vol.13 — BOUCHET", "vol": 13, "order": 2, "words": 29613, "year": null, "raw": {"spiritual_interiority": 123, "bodily_vulnerability": 135, "mission_desire": 25, "institutional_obedience": 23, "cultural_encounter": 2, "scientific_self": 3, "temporal_eschatological": 71}}, {"id": "1d601d7f", "label": "vol.13 — PERE", "vol": 13, "order": 3, "words": 13746, "year": 1715, "raw": {"spiritual_interiority": 27, "bodily_vulnerability": 27, "mission_desire": 20, "institutional_obedience": 7, "cultural_encounter": 5, "scientific_self": 0, "temporal_eschatological": 38}}, {"id": "d326a4ca", "label": "vol.13 — PERE", "vol": 13, "order": 4, "words": 7955, "year": null, "raw": {"spiritual_interiority": 30, "bodily_vulnerability": 33, "mission_desire": 5, "institutional_obedience": 6, "cultural_encounter": 0, "scientific_self": 0, "temporal_eschatological": 38}}];
+var DIMS=[["spiritual_interiority","Spiritual"],["bodily_vulnerability","Body"],["mission_desire","Desire"],["institutional_obedience","Obedience"],["cultural_encounter","Cultural"],["scientific_self","Science"],["temporal_eschatological","Eschatology"]];
+var NS="http://www.w3.org/2000/svg";
+function el(n,a,p){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+function median(a){var s=a.slice().sort(function(x,y){return x-y}),m=Math.floor(s.length/2);return s.length%2?s[m]:(s[m-1]+s[m])/2;}
+
+// labels: same volume and slot means a possible overlapping pair -> (a)/(b); same label in different slots -> letter number
+var bySlot={};
+DATA.forEach(function(r){var k=r.vol+"-"+r.order;(bySlot[k]=bySlot[k]||[]).push(r);});
+Object.keys(bySlot).forEach(function(k){var g=bySlot[k];if(g.length>1){g.sort(function(a,b){return b.words-a.words});g.forEach(function(r,i){r.label+=" ("+String.fromCharCode(97+i)+")";});}});
+var byLabel={};
+DATA.forEach(function(r){(byLabel[r.label]=byLabel[r.label]||[]).push(r);});
+Object.keys(byLabel).forEach(function(k){var g=byLabel[k];if(g.length>1){g.forEach(function(r){r.label+=" [letter "+r.order+"]";});}});
+
+// normalise per 1,000 words
+DATA.forEach(function(r){r.n={};DIMS.forEach(function(d){r.n[d[0]]=r.raw[d[0]]/r.words*1000;});});
+var MAX={},MED={};
+DIMS.forEach(function(d){var v=DATA.map(function(r){return r.n[d[0]]});MAX[d[0]]=Math.max.apply(null,v)||1;MED[d[0]]=median(v);});
+
+// select
+var pick=document.getElementById("pick");
+var o=document.createElement("option");o.value="";o.textContent="(none)";pick.appendChild(o);
+DATA.forEach(function(r,i){var op=document.createElement("option");op.value=i;op.textContent=r.label;pick.appendChild(op);});
+
+// parallel coordinates
+var pc=document.getElementById("pc"),W=880,H=330,P={t:30,b:55,l:50,r:40},iw=W-P.l-P.r,ih=H-P.t-P.b,step=iw/(DIMS.length-1);
+function X(i){return P.l+i*step}
+function Y(d,v){return P.t+ih*(1-v/MAX[d])}
+DIMS.forEach(function(d,i){
+  el("line",{x1:X(i),x2:X(i),y1:P.t,y2:P.t+ih,stroke:"currentColor","stroke-opacity":.25},pc);
+  var t=el("text",{x:X(i),y:P.t+ih+20,"text-anchor":"middle","font-size":12,fill:"currentColor","fill-opacity":.7,"font-family":"inherit"},pc);t.textContent=d[1];
+  var m=el("text",{x:X(i),y:P.t-10,"text-anchor":"middle","font-size":10,fill:"currentColor","fill-opacity":.55,"font-family":"inherit"},pc);m.textContent="max "+MAX[d[0]].toFixed(2);
+});
+var lines=[];
+DATA.forEach(function(r,idx){
+  var pts=DIMS.map(function(d,i){return X(i)+","+Y(d[0],r.n[d[0]])}).join(" ");
+  var pl=el("polyline",{points:pts,fill:"none",stroke:"var(--line)","stroke-width":1.3,"stroke-opacity":.45,tabindex:-1},pc);
+  pl.style.cursor="pointer";
+  pl.addEventListener("mouseenter",function(){select(idx,false)});
+  pl.addEventListener("click",function(){select(idx,true)});
+  lines.push(pl);
+});
+var sel=-1;
+function select(i,fromClick){
+  sel=i;pick.value=(i<0?"":i);
+  lines.forEach(function(l,j){var on=j===i;l.setAttribute("stroke",on?"var(--prussian)":"var(--line)");l.setAttribute("stroke-width",on?3.2:1.3);l.setAttribute("stroke-opacity",on?1:(i<0?.45:.2));if(on)pc.appendChild(l);});
+  info(i);drawRadar(i);
+}
+function info(i){
+  var box=document.getElementById("info");
+  if(i<0){box.textContent="Choose a record to see its values.";return;}
+  var r=DATA[i],s="<strong>"+r.label+"</strong> &middot; "+r.words.toLocaleString()+" words"+(r.year?" &middot; "+r.year:"")+"<br>";
+  s+=DIMS.map(function(d){return d[1]+" "+r.n[d[0]].toFixed(2)+" <span style='opacity:.6'>("+r.raw[d[0]]+" raw)</span>"}).join(" &nbsp;&middot;&nbsp; ");
+  box.innerHTML=s;
+}
+pick.addEventListener("change",function(){select(pick.value===""?-1:+pick.value,true)});
+
+// radar
+var rd=document.getElementById("radar"),cx=170,cy=165,R=105;
+function ang(i){return Math.PI*2*i/DIMS.length-Math.PI/2}
+function drawRadar(i){
+  while(rd.firstChild)rd.removeChild(rd.firstChild);
+  [.25,.5,.75,1].forEach(function(f){el("polygon",{points:DIMS.map(function(d,k){return (cx+R*f*Math.cos(ang(k)))+","+(cy+R*f*Math.sin(ang(k)))}).join(" "),fill:"none",stroke:"currentColor","stroke-opacity":.15},rd);});
+  DIMS.forEach(function(d,k){
+    el("line",{x1:cx,y1:cy,x2:cx+R*Math.cos(ang(k)),y2:cy+R*Math.sin(ang(k)),stroke:"currentColor","stroke-opacity":.2},rd);
+    var t=el("text",{x:cx+(R+20)*Math.cos(ang(k)),y:cy+(R+20)*Math.sin(ang(k)),"text-anchor":"middle","dominant-baseline":"middle","font-size":10,fill:"currentColor","fill-opacity":.7,"font-family":"inherit"},rd);t.textContent=d[1];
+  });
+  function shape(vals,stroke,fill,op,dash){
+    var pts=DIMS.map(function(d,k){var rr=Math.min(1,vals[d[0]]/MAX[d[0]])*R;return (cx+rr*Math.cos(ang(k)))+","+(cy+rr*Math.sin(ang(k)))}).join(" ");
+    var p=el("polygon",{points:pts,fill:fill,"fill-opacity":op,stroke:stroke,"stroke-width":2},rd);if(dash)p.setAttribute("stroke-dasharray",dash);
+  }
+  shape(MED,"var(--muted)","var(--muted)",.15);
+  var tb=document.getElementById("tbl"),h="<tr><th>Per 1,000 words</th><th>Selected</th><th>Median</th></tr>";
+  if(i>=0){shape(DATA[i].n,"var(--prussian)","var(--prussian)",.22);document.getElementById("leg-sel").textContent=DATA[i].label;}
+  else document.getElementById("leg-sel").textContent="Selected record (none)";
+  DIMS.forEach(function(d){h+="<tr><td>"+d[1]+"</td><td>"+(i>=0?DATA[i].n[d[0]].toFixed(2):"&ndash;")+"</td><td>"+MED[d[0]].toFixed(2)+"</td></tr>";});
+  tb.innerHTML=h;
+}
+select(-1,false);
+</script>
+</body>
+</html>

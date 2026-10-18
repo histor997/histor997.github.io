@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building Bridges Portal: Requirements at a Glance · Jinrui Zhang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.doc { max-width: 760px; margin: 0 auto; padding: 4rem 0 6rem; }
+.doc h1 { font-family: var(--display); font-weight: 400; font-size: clamp(1.9rem, 4.5vw, 2.7rem); text-align: center; margin-bottom: .4rem; }
+.doc .sub { text-align: center; color: var(--muted); font-style: italic; margin-bottom: 1.2rem; }
+.doc .back { text-align: center; margin-bottom: 2.5rem; font-size: .95rem; }
+.doc h2 { font-size: 1.15rem; margin: 2.6rem 0 .7rem; padding-bottom: .35rem; border-bottom: 1px solid var(--rule, #c9cfd6); }
+.doc p { margin-bottom: .9rem; }
+.status { border-left: 2px solid var(--prussian); padding: .1rem 0 .1rem 1.1rem; margin: 1.2rem 0 2rem; font-size: .95rem; color: var(--muted); }
+.doc table { width: 100%; border-collapse: collapse; font-size: .88rem; margin: .5rem 0 1rem; }
+.doc th, .doc td { text-align: left; vertical-align: top; padding: .4rem .6rem; border-bottom: 1px solid var(--rule, #c9cfd6); }
+.doc th { color: var(--prussian); font-weight: 700; }
+.doc ul { margin: .3rem 0 1rem 1.2rem; font-size: .95rem; }
+.doc li { margin-bottom: .35rem; }
+.tablewrap { overflow-x: auto; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="doc">
+    <h1>Building Bridges Portal</h1>
+    <p class="sub">Requirements at a glance, phase one</p>
+    <p class="back"><a href="index.html">&larr; Back to portfolio</a></p>
+
+    <div class="status">
+      <p style="margin:0">A summary of product requirements draft v0.1, written for working-group discussion. It is a draft and the site is not yet live. Statements about users are hypotheses to be tested, not research findings. The internal document is not linked.</p>
+    </div>
+
+    <h2>The one-sentence plan</h2>
+    <p>Phase one turns the official website into a trust-verification tool, so that a school leader or a local education office can understand Building Bridges in five minutes and feel safe contacting us. The student entry comes in phase two, after we interview past students.</p>
+
+    <h2>The problem</h2>
+    <p>The current site is a bilingual showcase page. Its recent content mostly links out to WeChat posts, and its share preview is empty. It says who we are. It does not answer what a decision-maker asks first when an invitation arrives from a program they have never worked with: is it safe, what is taught, what will it ask of the school, how do we cooperate. If the site cannot answer, the conversation usually stops there.</p>
+
+    <h2>Who it is for, in order</h2>
+    <div class="tablewrap">
+    <table>
+      <tr><th>User</th><th>What they most want to know</th><th>Priority</th></tr>
+      <tr><td>School leaders and local education offices</td><td>Safety, how course content is reviewed, the burden on the school, organizational background, what other schools say, and whether there is material they can show their superiors</td><td>P0</td></tr>
+      <tr><td>Prospective partner or endorsing bodies</td><td>Whether the program is orderly, sustainable, transparent, and careful in what it says publicly</td><td>P0</td></tr>
+      <tr><td>Prospective volunteers</td><td>What the work is, how long, how to apply, what past years looked like</td><td>P1</td></tr>
+      <tr><td>Funders</td><td>History, team, results, disclosure</td><td>P1</td></tr>
+      <tr><td>Alumni</td><td>Finding their own classes, sharing materials, telling their story</td><td>P1 to P2</td></tr>
+      <tr><td>Students and teaching assistants in camp</td><td>Where to go tonight, how to choose, how to give feedback</td><td>Phase two, interview first</td></tr>
+    </table>
+    </div>
+    <p>The decision is rarely one person's. The reader has to feel safe, and then be able to explain the decision to someone above them. The site has to support both.</p>
+
+    <h2>What phase one includes</h2>
+    <div class="tablewrap">
+    <table>
+      <tr><th>Page</th><th>The question it answers</th><th>Priority</th></tr>
+      <tr><td>Home</td><td>Who is BB, in three sentences, with a direct path to cooperation</td><td>P0</td></tr>
+      <tr><td>About us</td><td>History since 2008, mission, team, organizational background</td><td>P0</td></tr>
+      <tr><td>Program</td><td>How one camp runs: schedule, curriculum, faculty</td><td>P0</td></tr>
+      <tr><td>Safety and child protection</td><td>How volunteers are screened and trained, emergency plans, protection principles</td><td>P0</td></tr>
+      <tr><td>Compliance and cooperation process</td><td>Content review, what a school must do, what documents approval or filing needs, who to contact</td><td>P0</td></tr>
+      <tr><td>Past results and alumni stories</td><td>Data, school and student feedback, alumni cases with permission</td><td>P0</td></tr>
+      <tr><td>Contact</td><td>Email, contact person, inquiry form</td><td>P0</td></tr>
+      <tr><td>A pack for superiors</td><td>One page or PDF that can be forwarded</td><td>P1</td></tr>
+      <tr><td>Join us, shared resources, disclosure</td><td>Volunteer recruitment, open course materials, annual report</td><td>P1</td></tr>
+    </table>
+    </div>
+
+    <h2>What it deliberately does not do</h2>
+    <ul>
+      <li>Student accounts, course selection, and course evaluations.</li>
+      <li>A custom content management system. An existing site builder or CMS, so non-technical volunteers can update pages.</li>
+      <li>Online payments or memberships.</li>
+      <li>Any partnership or endorsement that has not been confirmed by the other side.</li>
+    </ul>
+
+    <h2>Rules for content, set before development</h2>
+    <ul>
+      <li>Every page has one content owner and one reviewer. A page is published only after review.</li>
+      <li>Students and alumni who appear in photos or video need explicit permission. No identifiable information about minors.</li>
+      <li>An alumni story needs the person's written consent, and a guardian's consent for a minor. The purpose and the audience are stated, and consent can be withdrawn.</li>
+      <li>A partnership appears only after the other side confirms it, in wording they have approved. Every number has a source.</li>
+    </ul>
+
+    <h2>How we will know it works</h2>
+    <div class="tablewrap">
+    <table>
+      <tr><th>Test</th><th>Pass condition (draft)</th></tr>
+      <tr><td>Five-minute trust test</td><td>Three principals or educators look at the site for five minutes. At least two can say who BB is, what it does, how safety is ensured, how past camps went, and how to reach us.</td></tr>
+      <tr><td>Approval-chain test</td><td>The same people can explain BB to a superior in three sentences, and explain why it is reliable.</td></tr>
+      <tr><td>Phone and WeChat</td><td>The Chinese homepage loads in about three seconds in WeChat's built-in browser. Video plays in mainland China without a VPN.</td></tr>
+      <tr><td>Share preview</td><td>A forwarded link shows a title, summary, and cover image.</td></tr>
+      <tr><td>Content is checkable</td><td>Every page names an owner and a reviewer. Every number has a source. Unconfirmed endorsements are not shown.</td></tr>
+      <tr><td>Freshness</td><td>Every page shows its last update. Contents are reviewed once a semester.</td></tr>
+      <tr><td>Where inquiries come from</td><td>Inquiry and application forms ask how the person heard about us.</td></tr>
+    </table>
+    </div>
+    <p>The numeric targets wait until we have one semester of baseline.</p>
+
+    <h2>Growth, as loops rather than traffic</h2>
+    <p>BB does not need more visitors. It needs three loops to reinforce themselves: trust (real reviews from partner schools lead new schools and endorsers to reply), recruitment (volunteer stories and course materials bring new volunteers), and alumni return (a student becomes a teaching assistant, then comes back to teach, and becomes a visible example for the next cohort). The site exists to make those three turn.</p>
+
+    <h2>A test of my thinking: how Notion grew</h2>
+    <p>I used Notion's early growth to test these ideas, not as a template to copy. Interviews with people on Notion's team describe a pattern worth borrowing in spirit.</p>
+    <ul>
+      <li><strong>A loop, not a funnel.</strong> Notion users made templates, shared them, and brought in new users who made templates of their own. For BB the equivalent is past courses and alumni stories being seen, which brings new volunteers and partner schools, which produces new courses and stories.</li>
+      <li><strong>Start with a small core, and treat them as members.</strong> Notion's ambassador program began with about twenty vocal users, and its team found a small, highly engaged community better than a large one in the early days. For BB, alumni ambassadors begin at ten to twenty people, and the interviews are the first step.</li>
+      <li><strong>A few people who truly agree beat a lot of general attention.</strong> A program that involves minors should not chase traffic.</li>
+      <li><strong>Do not overstate.</strong> This one is our own rule, not Notion's: only confirmed partnerships are shown.</li>
+    </ul>
+    <p style="font-size:.88rem;color:var(--muted)">Sources: <a href="https://www.dock.us/library/grow-and-tell-camille-ricketts">Camille Ricketts on Notion's community-led growth (Dock)</a> and <a href="https://www.decibel.vc/content/community-led-growth-how-notion-grew-a-global-community-of-advocates">Community-led growth at Notion (Decibel)</a>. Both are interviews with members of Notion's team. I have not checked them against Notion's own materials.</p>
+
+    <h2>The biggest risk</h2>
+    <p>Content and voice. If no one supplies material and no one is responsible for what is said publicly, the site is an empty shell. The draft ends with the decisions that have to be made first: who owns external statements, when and in what wording a partnership is shown, which safety policies can be public, which numbers can be public, who maintains the Chinese and English versions, and whether servers sit in mainland China or overseas.</p>
+
+    <h2>The full document</h2>
+    <p>The complete requirements document, in Chinese, is available as a PDF: <a href="bb-prd-zh.pdf">BB portal requirements v0.1 (draft, Chinese)</a>. It adds the user portraits, which are hypotheses, an interview plan with consent rules, and the open decisions for the group.</p>
+
+    <p style="margin-top:2.5rem" class="back"><a href="index.html">&larr; Back to portfolio</a></p>
+  </div>
+</div>
+</body>
+</html>
